@@ -1,6 +1,7 @@
 package co.empathy.academy.search;
 
 
+import co.empathy.academy.ElasticConnection;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
