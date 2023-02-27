@@ -18,10 +18,12 @@ public class SearchController {
 
         SearchResponse response = new SearchResponse();
         String clusterName = null;
+        String hostname = "elasticsearch";
+        int port = 9200;
         try {
-            clusterName = ElasticConnection.getInstance().getClusterName();
+            clusterName = ElasticConnection.getInstance(hostname, port).getClusterName();
         } catch (IOException e) {
-            clusterName = "Error retrieving cluster name: " + e.getMessage();
+            clusterName = "Error retrieving cluster named: " + e.getMessage();
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
