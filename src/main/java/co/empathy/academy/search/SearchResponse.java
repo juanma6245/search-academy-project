@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class SearchResponse {
 
-    String query;
-    String clusterName;
+    private String query;
+    private String clusterName;
 
     public String getQuery() {
         return query;

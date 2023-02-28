@@ -2,7 +2,9 @@ package co.empathy.academy.search;
 
 
 import co.empathy.academy.ElasticConnection;
+import org.apache.http.HttpHost;
 import org.apache.tomcat.util.json.ParseException;
+import org.elasticsearch.client.RestClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +22,11 @@ public class SearchController {
         String clusterName = null;
         String hostname = "elasticsearch";
         int port = 9200;
+        ElasticConnection connection = new ElasticConnection(RestClient.builder(new HttpHost(hostname, port)).build());
         try {
-            clusterName = ElasticConnection.getInstance(hostname, port).getClusterName();
+            clusterName = connection.getClusterName();
         } catch (IOException e) {
-            clusterName = "Error retrieving cluster named: " + e.getMessage();
+            clusterName = "Error retrieving cluster name: " + e.getMessage();
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
