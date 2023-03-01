@@ -1,4 +1,4 @@
-package co.empathy.academy.search;
+package co.empathy.academy.search.model;
 
 import lombok.Data;
 

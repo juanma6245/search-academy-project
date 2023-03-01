@@ -1,10 +1,9 @@
-package co.empathy.academy.search;
+package co.empathy.academy.search.controller;
 
-
-import co.empathy.academy.ElasticConnection;
-import org.apache.http.HttpHost;
+import co.empathy.academy.search.model.SearchResponse;
+import co.empathy.academy.search.service.SearchService;
 import org.apache.tomcat.util.json.ParseException;
-import org.elasticsearch.client.RestClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +14,16 @@ import java.io.IOException;
 @RequestMapping("/")
 public class SearchController {
 
+    @Autowired
+    private SearchService searchService;
     @GetMapping("/search{query}")
     public ResponseEntity<SearchResponse> search(@RequestParam(name = "query", defaultValue = "No query") String query) {
 
         SearchResponse response = new SearchResponse();
         String clusterName = null;
-        String hostname = "elasticsearch";
-        int port = 9200;
-        ElasticConnection connection = new ElasticConnection(RestClient.builder(new HttpHost(hostname, port)).build());
+
         try {
-            clusterName = connection.getClusterName();
+            clusterName = searchService.getClusterName();
         } catch (IOException e) {
             clusterName = "Error retrieving cluster name: " + e.getMessage();
         } catch (ParseException e) {
