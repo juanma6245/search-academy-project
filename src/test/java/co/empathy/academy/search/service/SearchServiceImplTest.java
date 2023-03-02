@@ -1,41 +1,37 @@
 package co.empathy.academy.search.service;
 
-import co.empathy.academy.search.service.client.SearchEngine;
-import co.empathy.academy.search.service.client.SearchEngineImpl;
+import co.empathy.academy.search.repository.ElasticConnection;
 import org.apache.tomcat.util.json.ParseException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 class SearchServiceImplTest {
 
-    private SearchEngineImpl searchEngine;
+    @Mock
+    private ElasticConnection connection;
 
+    @InjectMocks
     private SearchServiceImpl searchService;
 
-    public SearchServiceImplTest() {
-        this.searchEngine = mock();
-        this.searchService = new SearchServiceImpl(this.searchEngine);
-    }
 
     @Test
     void search() throws ParseException, IOException {
-        when(searchEngine.executeQuery("test")).thenReturn("test");
-        assertEquals(searchService.search("test"), searchEngine.executeQuery("test"));
+        when(connection.getClusterName()).thenReturn("test");
+        assertEquals(searchService.search("test"), "test");
         assertEquals(searchService.search(""), "Error: Query is blank");
     }
 
     @Test
     void getClusterName() throws ParseException, IOException {
-        when(searchEngine.executeQuery("queryCluster")).thenReturn("docker-cluster");
+        when(connection.getClusterName()).thenReturn("docker-cluster");
         assertEquals(searchService.getClusterName(), "docker-cluster");
     }
 }

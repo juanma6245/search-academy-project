@@ -1,7 +1,9 @@
 package co.empathy.academy.search.service;
 
-import co.empathy.academy.search.service.client.SearchEngine;
+import co.empathy.academy.search.repository.ElasticConnection;
+
 import org.apache.tomcat.util.json.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -9,17 +11,16 @@ import java.io.IOException;
 @Service
 public class SearchServiceImpl implements SearchService{
 
-    private final SearchEngine searchEngine;
+    @Autowired
+    private ElasticConnection connection;
 
-    public SearchServiceImpl(SearchEngine searchEngine) {
-        this.searchEngine = searchEngine;
-    }
 
     @Override
     public String search(String query) throws ParseException, IOException {
         String response;
         if (!query.isBlank()) {
-            response = this.searchEngine.executeQuery(query);
+            //response = this.connection.executeQuery(query);
+            response = this.connection.getClusterName();
         } else {
             response = "Error: Query is blank";
         }
@@ -28,6 +29,6 @@ public class SearchServiceImpl implements SearchService{
 
     @Override
     public String getClusterName() throws ParseException, IOException {
-        return searchEngine.executeQuery("queryCluster");
+        return this.connection.getClusterName();
     }
 }

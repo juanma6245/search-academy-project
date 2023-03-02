@@ -4,8 +4,6 @@ package co.empathy.academy.search.configuration;
 
 
 import co.empathy.academy.search.repository.ElasticConnection;
-import co.empathy.academy.search.service.client.SearchEngine;
-import co.empathy.academy.search.service.client.SearchEngineImpl;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +20,4 @@ public class Config {
         return new ElasticConnection(RestClient.builder(new HttpHost(hostname, port)).build());
     }
 
-    @Bean
-    public SearchEngine searchEngine() {
-        return new SearchEngineImpl();
-    }
 }
