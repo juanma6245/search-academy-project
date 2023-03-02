@@ -2,7 +2,8 @@ package co.empathy.academy.search.configuration;
 
 
 
-import co.empathy.academy.ElasticConnection;
+
+import co.empathy.academy.search.repository.ElasticConnection;
 import co.empathy.academy.search.service.client.SearchEngine;
 import co.empathy.academy.search.service.client.SearchEngineImpl;
 import org.apache.http.HttpHost;

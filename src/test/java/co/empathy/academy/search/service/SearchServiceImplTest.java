@@ -12,16 +12,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-@SpringBootTest
-@AutoConfigureMockMvc
+
 class SearchServiceImplTest {
 
-    @Mock
     private SearchEngineImpl searchEngine;
 
-    @InjectMocks
     private SearchServiceImpl searchService;
+
+    public SearchServiceImplTest() {
+        this.searchEngine = mock();
+        this.searchService = new SearchServiceImpl(this.searchEngine);
+    }
 
     @Test
     void search() throws ParseException, IOException {

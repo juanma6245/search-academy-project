@@ -1,6 +1,7 @@
 package co.empathy.academy.search.service.client;
 
-import co.empathy.academy.ElasticConnection;
+
+import co.empathy.academy.search.repository.ElasticConnection;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
