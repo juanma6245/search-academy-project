@@ -31,9 +31,8 @@ public class ElasticConnection {
         return client;
     }
 
-    public String getClusterName() throws ParseException, IOException {
-        JSONParser jsonParser = new JSONParser(client.cluster().state().valueBody().toString());
+    public String getClusterName() throws IOException {
 
-        return jsonParser.parseObject().get("cluster_name").toString();
+        return this.client.cluster().health().clusterName();
     }
 }
