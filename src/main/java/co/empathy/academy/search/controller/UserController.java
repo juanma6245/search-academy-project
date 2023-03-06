@@ -1,38 +1,55 @@
 package co.empathy.academy.search.controller;
 
+import co.empathy.academy.search.exception.ExistingUserException;
 import co.empathy.academy.search.exception.UserNotFoundException;
 import co.empathy.academy.search.model.User;
 import co.empathy.academy.search.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.websocket.server.PathParam;
+import java.util.List;
+
 
 @RestController
-@RequestMapping("/users/")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @GetMapping("{id}")
-    public ResponseEntity<User> getUserById(@PathParam("id") Long id) {
-        User userResponse;
+    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+        User user;
         ResponseEntity<User> response = null;
         try {
-             userResponse = userService.get(id);
-             response = new ResponseEntity<>(userResponse, HttpStatus.OK);
+             user = userService.get(id);
+             response = new ResponseEntity<>(user, HttpStatus.OK);
         } catch (UserNotFoundException e) {
-            response = new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found", e);
         } catch (NullPointerException e) {
-            response = new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found", e);
         }
+        return response;
+    }
 
+    @PostMapping("")
+    public ResponseEntity<User> createUser(@RequestBody User user){
+        ResponseEntity<User> response = null;
+        try {
+            this.userService.save(user);
+            response = new ResponseEntity<>(user, HttpStatus.CREATED);
+        } catch (ExistingUserException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already in memory", e);
+        }
+        return response;
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<User>> getUsers() {
+        ResponseEntity<List<User>> response = new ResponseEntity<>(this.userService.getAll(), HttpStatus.OK);
         return response;
     }
 }
