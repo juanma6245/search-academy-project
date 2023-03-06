@@ -27,9 +27,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void delete(User user) throws UserNotFoundException {
-        if (this.map.containsKey(user.getId())) {
-            this.map.remove(user.getId());
+    public void delete(Long id) throws UserNotFoundException {
+        if (this.map.containsKey(id)) {
+            this.map.remove(id);
         } else {
             throw new UserNotFoundException("Can't find user");
         }
