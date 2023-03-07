@@ -1,0 +1,103 @@
+swagger: "2.0"
+info:
+  title: Assignment API
+  description: API for assignment 2, control of users
+  version: 1.0.0
+schemes:
+  - https
+paths:
+  /users:
+    get:
+      summary: Returns a list of all users.
+      operationId: getUsers
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+    post:
+      summary: Creates a new user.
+      operationId: createUser
+      parameters:
+        - in: body
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric Id of the user to be created.
+        - in: body
+          name: name
+          schema:
+            type: string
+          required: false
+          description: Name of the user.
+        - in: body
+          name: email
+          schema:
+            type: string
+          required: false
+          description: Email of the user.
+      responses:
+        201:
+          description: Created user.
+        400:
+          description: User already in memory.
+  /users/{id}:
+    get:
+      summary: Return user by Id.
+      operationId: getUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Numeric Id of the user.
+      responses:
+        200:
+          description: OK.
+        404:
+          description: Can't find user.
+    put:
+      summary: Modify given parameters in user by Id.
+      operationId: modifyUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Numeric Id of the user.
+        - in: body
+          name: name
+          schema:
+            type: string
+          required: false
+          description: New name of the user.
+        - in: body
+          name: email
+          schema:
+            type: string
+          required: false
+          description: New email of the user.
+      responses:
+        204:
+          description: Modified user.
+        404:
+          description: Can't find user.
+    delete:
+      summary: Delete user by Id
+      operationId: deleteUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Numeric Id of the user.
+      responses:
+        204:
+          description: Deleted user.
+        404:
+          description: Can't find user.
+
