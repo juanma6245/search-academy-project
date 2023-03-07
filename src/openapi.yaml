@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   title: Assignment API
-  description: API for assignment 2, control of users
+  description: API for assignment 2, user control
   version: 1.0.0
 schemes:
   - https
