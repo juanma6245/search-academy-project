@@ -10,17 +10,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.io.IOException;
+
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {UserNotFoundException.class, NullPointerException.class})
-    protected ResponseEntity<Object> handleNotFound(Exception ex , WebRequest request){
+    protected ResponseEntity<?> handleNotFound(Exception ex , WebRequest request){
         String body = "Can't find the requested user";
         return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler(value = {ExistingUserException.class})
-    protected ResponseEntity<Object> handleExistingUser(Exception ex , WebRequest request) {
+    protected ResponseEntity<?> handleExistingUser(Exception ex , WebRequest request) {
         String body = "User already in memory";
+        return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = {IOException.class})
+    protected ResponseEntity<?> handleFileError(Exception ex, WebRequest request) {
+        String body = "Error in file upload";
         return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }

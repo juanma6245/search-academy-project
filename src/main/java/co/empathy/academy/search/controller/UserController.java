@@ -4,12 +4,18 @@ import co.empathy.academy.search.exception.ExistingUserException;
 import co.empathy.academy.search.exception.UserNotFoundException;
 import co.empathy.academy.search.model.User;
 import co.empathy.academy.search.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.ArrayType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -60,13 +66,23 @@ public class UserController {
         return response;
     }
 
+    @PostMapping("/file")
+    public ResponseEntity<List<User>> uploadFile(@RequestParam("file") MultipartFile file) throws IOException, ExistingUserException {
+        ResponseEntity<List<User>> response;
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<User> users = objectMapper.readValue(file.getInputStream(), new TypeReference<List<User>>(){});
+        for (User user: users) {
+            this.userService.save(user);
+        }
+        response = new ResponseEntity<>(users, HttpStatus.CREATED);
+        return response;
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity<User> deleteUser(@PathVariable("id") Long id) throws UserNotFoundException {
         ResponseEntity<User> response = null;
         this.userService.delete(id);
         response = new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-
-
         return response;
     }
 
