@@ -6,7 +6,6 @@ import co.empathy.academy.search.model.User;
 import co.empathy.academy.search.service.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.ArrayType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +13,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -71,17 +68,17 @@ public class UserController {
     }
 
     @PostMapping("/file")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @Async
-    public Future<ResponseEntity<List<User>>> uploadFile(@RequestParam("file") MultipartFile file) throws IOException, ExistingUserException, InterruptedException, ExecutionException {
-        Future<ResponseEntity<List<User>>> response;
+    public Future<ResponseEntity<?>> uploadFile(@RequestParam("file") MultipartFile file) throws IOException, ExistingUserException, InterruptedException, ExecutionException {
+        Future<ResponseEntity<?>> response = new AsyncResult<>(ResponseEntity.status(HttpStatus.OK).build());
         ObjectMapper objectMapper = new ObjectMapper();
         List<User> users = objectMapper.readValue(file.getInputStream(), new TypeReference<List<User>>(){});
         //Thread.sleep(10000);
         for (User user: users) {
             this.userService.save(user);
+            //Thread.sleep(1000);
         }
-
-        response = new AsyncResult<>(new ResponseEntity<>(users, HttpStatus.CREATED));
         return response;
     }
 
