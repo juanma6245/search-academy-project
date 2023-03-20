@@ -5,6 +5,13 @@ import co.empathy.academy.search.model.title.*;
 
 public class FactoryTitle implements IFactoryTitle{
 
+    private static final FactoryTitle instance = new FactoryTitle();
+    private FactoryTitle() {
+    }
+
+    public static FactoryTitle getInstance() {
+        return instance;
+    }
     @Override
     public Title getTitle(CSVtype type, Object[] data) {
         switch (type){
