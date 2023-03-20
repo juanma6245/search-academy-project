@@ -36,4 +36,14 @@ public class TSVServiceImpl implements TSVService {
         br.close();
         return response;
     }
+
+    @Override
+    public Title readOneTSV(BufferedReader br, CSVtype type) throws IOException {
+        IFactoryTitle factory = FactoryTitle.getInstance();
+        String line = br.readLine();
+        String[] data = line.split("\t");
+
+        Title title = factory.getTitle(type, data);
+        return title;
+    }
 }
