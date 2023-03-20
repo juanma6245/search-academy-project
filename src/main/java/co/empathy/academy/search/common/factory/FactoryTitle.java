@@ -13,42 +13,55 @@ public class FactoryTitle implements IFactoryTitle{
         return instance;
     }
     @Override
-    public Title getTitle(CSVtype type, Object[] data) {
+    public Title getTitle(CSVtype type, String[] data) {
         switch (type){
             case AKA:
+                String[] types = data[5].split(",");
+                String[] attributes = data[6].split(",");
                 return new Aka(
                         (String) data[0],
-                        (Integer) data[1],
+                        Integer.valueOf(data[1]) ,
                         (String) data[2],
                         (String) data[3],
                         (String) data[4],
-                        (String[]) data[5],
-                        (String[]) data[6],
+                        types,
+                        attributes,
                         (String) data[7]
                 );
             case BASIC:
+                Boolean adult;
+                if (data[4].equals("0")) {
+                    adult = false;
+                } else {
+                    adult = true;
+                }
+                String[] genres = data[8].split(",");
                 return new Basic(
                         (String) data[0],
                         (String) data[1],
                         (String) data[2],
                         (String) data[3],
-                        (Boolean) data[4],
+                        adult,
                         (String) data[5],
                         (String) data[6],
-                        (Integer) data[7],
-                        (String[]) data[8]
+                        Integer.valueOf(data[7]),
+                        genres
                 );
             case CREW:
+                String[] directors = data[1].split(",");
+                String[] writers = data[2].split(",");
                 return new Crew(
                         (String) data[0],
-                        (String[]) data[1],
-                        (String[]) data[2]);
+                        directors,
+                        writers
+                );
             case EPISODE:
                 return new Episode(
                         (String) data[0],
                         (String) data[1],
-                        (Integer) data[2],
-                        (Integer) data[3]);
+                        Integer.valueOf(data[2]),
+                        Integer.valueOf(data[3])
+                );
             case PRINCIPAL:
                 return new Principal(
                         (String) data[0],
@@ -60,8 +73,9 @@ public class FactoryTitle implements IFactoryTitle{
             case RATING:
                 return new Rating(
                         (String) data[0],
-                        (Double) data[1],
-                        (Integer) data[2]);
+                        Double.valueOf(data[1]),
+                        Integer.valueOf(data[2])
+                );
             default:
                 return null;
         }
