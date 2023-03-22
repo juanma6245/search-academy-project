@@ -24,7 +24,7 @@ public class FileTaskServiceImpl implements FileTaskService{
                 String headers = br.readLine();
                 for (int i = 0; i < lines; i++) {
                     Title title = TSVService.readOneTSV(br, type);
-                    System.out.println(title);
+                    //System.out.println(title);
                     //Save in ElasticSearch
                 }
         }
