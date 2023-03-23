@@ -34,4 +34,9 @@ public class Crew implements Title{
     public void setWriters(String[] writers) {
         this.writers = writers;
     }
+
+    @Override
+    public String getId() {
+        return tconst;
+    }
 }

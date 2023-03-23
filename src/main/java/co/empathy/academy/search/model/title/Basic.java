@@ -8,10 +8,10 @@ public class Basic implements Title{
     private boolean isAdult;
     private String startYear;
     private String endYear;
-    private int runtimeMinutes;
+    private String runtimeMinutes;
     private String[] genres;
 
-    public Basic(String tconst, String titleType, String primaryTitle, String originalTitle, boolean isAdult, String startYear, String endYear, int runtimeMinutes, String[] genres) {
+    public Basic(String tconst, String titleType, String primaryTitle, String originalTitle, boolean isAdult, String startYear, String endYear, String runtimeMinutes, String[] genres) {
         this.tconst = tconst;
         this.titleType = titleType;
         this.primaryTitle = primaryTitle;
@@ -79,11 +79,11 @@ public class Basic implements Title{
         this.endYear = endYear;
     }
 
-    public int getRuntimeMinutes() {
+    public String getRuntimeMinutes() {
         return runtimeMinutes;
     }
 
-    public void setRuntimeMinutes(int runtimeMinutes) {
+    public void setRuntimeMinutes(String runtimeMinutes) {
         this.runtimeMinutes = runtimeMinutes;
     }
 
@@ -93,5 +93,10 @@ public class Basic implements Title{
 
     public void setGenres(String[] genres) {
         this.genres = genres;
+    }
+
+    @Override
+    public String getId() {
+        return tconst;
     }
 }

@@ -34,4 +34,9 @@ public class Rating implements Title{
     public void setNumVotes(int numVotes) {
         this.numVotes = numVotes;
     }
+
+    @Override
+    public String getId() {
+        return tconst;
+    }
 }

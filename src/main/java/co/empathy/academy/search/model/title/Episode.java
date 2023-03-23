@@ -44,4 +44,9 @@ public class Episode implements Title{
     public void setEpisodeNumber(int episodeNumber) {
         this.episodeNumber = episodeNumber;
     }
+
+    @Override
+    public String getId() {
+        return tconst;
+    }
 }

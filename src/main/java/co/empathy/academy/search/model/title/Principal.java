@@ -64,4 +64,9 @@ public class Principal implements Title {
     public void setCharacters(String characters) {
         this.characters = characters;
     }
+
+    @Override
+    public String getId() {
+        return tconst;
+    }
 }

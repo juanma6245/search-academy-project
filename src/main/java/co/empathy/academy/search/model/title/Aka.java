@@ -84,4 +84,9 @@ public class Aka implements Title{
     public void setIsOriginalTitle(String isOriginalTitle) {
         this.isOriginalTitle = isOriginalTitle;
     }
+
+    @Override
+    public String getId() {
+        return titleId;
+    }
 }

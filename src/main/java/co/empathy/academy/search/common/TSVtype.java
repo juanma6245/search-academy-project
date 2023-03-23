@@ -1,7 +1,7 @@
 package co.empathy.academy.search.common;
 
 
-public enum CSVtype {
+public enum TSVtype {
     AKA,
     BASIC,
     CREW,
