@@ -1,6 +1,6 @@
 package co.empathy.academy.search.service;
 
-import co.empathy.academy.search.common.CSVtype;
+import co.empathy.academy.search.common.TSVtype;
 import co.empathy.academy.search.common.factory.FactoryTitle;
 import co.empathy.academy.search.common.factory.IFactoryTitle;
 import co.empathy.academy.search.model.title.Title;
@@ -13,7 +13,7 @@ import java.util.List;
 public class TSVServiceImpl implements TSVService {
 
     @Override
-    public List<Title> readTSV(File file, CSVtype type) throws IOException {
+    public List<Title> readTSV(File file, TSVtype type) throws IOException {
         List<Title> response = new ArrayList<>();
         IFactoryTitle factory = FactoryTitle.getInstance();
         BufferedReader br;
@@ -38,7 +38,7 @@ public class TSVServiceImpl implements TSVService {
     }
 
     @Override
-    public Title readOneTSV(BufferedReader br, CSVtype type) throws IOException {
+    public Title readOneTSV(BufferedReader br, TSVtype type) throws IOException {
         IFactoryTitle factory = FactoryTitle.getInstance();
         String line = br.readLine();
         String[] data = line.split("\t");
