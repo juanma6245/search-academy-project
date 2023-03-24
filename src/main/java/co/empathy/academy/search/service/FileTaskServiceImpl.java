@@ -31,5 +31,6 @@ public class FileTaskServiceImpl implements FileTaskService{
             response = elasticConnection.index(title, type);
             //System.out.println(response.id());
         }
+        file.delete();
     }
 }
