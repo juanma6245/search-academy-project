@@ -18,6 +18,12 @@ public class FactoryTitle implements IFactoryTitle{
             case AKA:
                 String[] types = data[5].split(",");
                 String[] attributes = data[6].split(",");
+                boolean isOriginalTitle;
+                if (data[7].equals("0")) {
+                    isOriginalTitle = false;
+                } else {
+                    isOriginalTitle = true;
+                }
                 return new Aka(
                         data[0],
                         Integer.valueOf(data[1]) ,
@@ -26,7 +32,7 @@ public class FactoryTitle implements IFactoryTitle{
                         data[4],
                         types,
                         attributes,
-                        data[7]
+                        isOriginalTitle
                 );
             case BASIC:
                 Boolean adult;
@@ -35,16 +41,34 @@ public class FactoryTitle implements IFactoryTitle{
                 } else {
                     adult = true;
                 }
+                int startYear;
+                if (data[5].equals("\\N")) {
+                    startYear = 0;
+                } else {
+                    startYear = Integer.valueOf(data[5]);
+                }
+                int endYear;
+                if (data[6].equals("\\N")) {
+                    endYear = 0;
+                } else {
+                    endYear = Integer.valueOf(data[6]);
+                }
                 String[] genres = data[8].split(",");
+                int runtimeMinutes;
+                if (data[7].equals("\\N")) {
+                    runtimeMinutes = 0;
+                } else {
+                    runtimeMinutes = Integer.valueOf(data[7]);
+                }
                 return new Basic(
                         data[0],
                         data[1],
                         data[2],
                         data[3],
                         adult,
-                        data[5],
-                        data[6],
-                        data[7],
+                        startYear,
+                        endYear,
+                        runtimeMinutes,
                         genres
                 );
             case CREW:
@@ -56,16 +80,28 @@ public class FactoryTitle implements IFactoryTitle{
                         writers
                 );
             case EPISODE:
+                int seasonNumber;
+                if (data[2].equals("\\N")) {
+                    seasonNumber = 0;
+                } else {
+                    seasonNumber = Integer.valueOf(data[2]);
+                }
+                int episodeNumber;
+                if (data[3].equals("\\N")) {
+                    episodeNumber = 0;
+                } else {
+                    episodeNumber = Integer.valueOf(data[3]);
+                }
                 return new Episode(
                         data[0],
                         data[1],
-                        Integer.valueOf(data[2]),
-                        Integer.valueOf(data[3])
+                        seasonNumber,
+                        episodeNumber
                 );
             case PRINCIPAL:
                 return new Principal(
                         data[0],
-                        data[1],
+                        Integer.valueOf(data[1]),
                         data[2],
                         data[3],
                         data[4],

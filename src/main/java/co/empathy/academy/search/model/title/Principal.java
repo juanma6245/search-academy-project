@@ -2,13 +2,13 @@ package co.empathy.academy.search.model.title;
 
 public class Principal implements Title {
     private String tconst;
-    private String ordering;
+    private int ordering;
     private String nconst;
     private String category;
     private String job;
     private String characters;
 
-    public Principal(String tconst, String ordering, String nconst, String category, String job, String characters) {
+    public Principal(String tconst, int ordering, String nconst, String category, String job, String characters) {
         this.tconst = tconst;
         this.ordering = ordering;
         this.nconst = nconst;
@@ -25,11 +25,11 @@ public class Principal implements Title {
         this.tconst = tconst;
     }
 
-    public String getOrdering() {
+    public int getOrdering() {
         return ordering;
     }
 
-    public void setOrdering(String ordering) {
+    public void setOrdering(int ordering) {
         this.ordering = ordering;
     }
 

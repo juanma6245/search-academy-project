@@ -8,9 +8,9 @@ public class Aka implements Title{
     private String language;
     private String[] types;
     private String[] attributes;
-    private String isOriginalTitle;
+    private boolean isOriginalTitle;
 
-    public Aka(String titleId, int ordering, String title, String region, String language, String[] types, String[] attributes, String isOriginalTitle) {
+    public Aka(String titleId, int ordering, String title, String region, String language, String[] types, String[] attributes, boolean isOriginalTitle) {
         this.titleId = titleId;
         this.ordering = ordering;
         this.title = title;
@@ -77,11 +77,11 @@ public class Aka implements Title{
         this.attributes = attributes;
     }
 
-    public String getIsOriginalTitle() {
+    public boolean isOriginalTitle() {
         return isOriginalTitle;
     }
 
-    public void setIsOriginalTitle(String isOriginalTitle) {
+    public void setIsOriginalTitle(boolean isOriginalTitle) {
         this.isOriginalTitle = isOriginalTitle;
     }
 
