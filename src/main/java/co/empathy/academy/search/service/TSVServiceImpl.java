@@ -23,7 +23,7 @@ public class TSVServiceImpl implements TSVService {
         br = new BufferedReader(new InputStreamReader(input));
         String headers = br.readLine();
         while ((line = br.readLine()) != null) {
-            //System.out.println(line);
+            System.out.println(line);
             String[] data = line.split("\t");
 
             Title title = factory.getTitle(type, data);
@@ -41,6 +41,10 @@ public class TSVServiceImpl implements TSVService {
     public Title readOneTSV(BufferedReader br, TSVtype type) throws IOException {
         IFactoryTitle factory = FactoryTitle.getInstance();
         String line = br.readLine();
+        //System.out.println(line);
+        if (line == null) {
+            return null;
+        }
         String[] data = line.split("\t");
 
         Title title = factory.getTitle(type, data);
