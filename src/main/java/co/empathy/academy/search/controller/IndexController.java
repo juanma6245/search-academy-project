@@ -1,6 +1,8 @@
 package co.empathy.academy.search.controller;
 
 import co.empathy.academy.search.service.IndexService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.jobrunr.jobs.Job;
 import org.jobrunr.jobs.JobId;
 import org.jobrunr.scheduling.BackgroundJob;
@@ -26,6 +28,15 @@ public class IndexController {
     @Autowired
     private IndexService indexService;
     @PostMapping("")
+    @Operation(summary = "Index the data",
+            description = "Index the data",
+            tags = {"Index"},
+            operationId = "index",
+            responses = {
+                    @ApiResponse(responseCode = "202", description = "Indexing started"),
+                    @ApiResponse(responseCode = "400", description = "Bad request"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
     public ResponseEntity index(
             @RequestParam("basic") MultipartFile basicMultipartFile,
             @RequestParam("aka") MultipartFile akaMultipartFile,
@@ -41,7 +52,7 @@ public class IndexController {
         File principal = this._getTempFile(principalMultipartFile);
         File rating = this._getTempFile(ratingMultipartFile);
         File crew = this._getTempFile(crewMultipartFile);
-
+        System.out.println("Files created");
         JobId jobId = BackgroundJob.enqueue(() ->
                 indexService.index(basic, aka, episode, principal, rating, crew)
         );
