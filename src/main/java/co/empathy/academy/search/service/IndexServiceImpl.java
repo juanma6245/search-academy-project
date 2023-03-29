@@ -6,7 +6,6 @@ import jakarta.json.Json;
 import co.empathy.academy.search.common.TSVtype;
 import co.empathy.academy.search.repository.ElasticConnection;
 import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import org.jobrunr.jobs.JobId;
 import org.jobrunr.scheduling.BackgroundJob;
@@ -65,13 +64,13 @@ public class IndexServiceImpl implements IndexService{
     }
 
     @Override
-    public void createIndex(String indexName) {
-
+    public boolean createIndex(String indexName) throws IOException {
+        return this.elasticConnection.createIndex(indexName); //Trows exception when index already exists
     }
 
     @Override
     public boolean deleteIndex(String indexName) throws IOException {
-        return this.elasticConnection.deleteIndex(indexName);
+        return this.elasticConnection.deleteIndex(indexName); //Trows exception when index not exists
     }
 
     @Override

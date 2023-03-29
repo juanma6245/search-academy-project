@@ -2,14 +2,20 @@ package co.empathy.academy.search.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
+import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
+import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
+import co.elastic.clients.elasticsearch.indices.IndexSettings;
+import co.elastic.clients.elasticsearch.transform.Settings;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.util.ObjectBuilder;
 import co.empathy.academy.search.model.title.Title;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
@@ -19,6 +25,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 public class ElasticConnection {
 
@@ -26,6 +35,7 @@ public class ElasticConnection {
     private RestClient restClient;
     private ElasticsearchTransport transport;
     private ElasticsearchClient client;
+
     public ElasticConnection(RestClient restClient) {
         //restClient =RestClient.builder(
         //        new HttpHost(hostname, port)).build();
@@ -46,9 +56,9 @@ public class ElasticConnection {
         return this.client.cluster().health().clusterName();
     }
 
-    public IndexResponse index(Title document, String name) throws IOException {
+    public IndexResponse index(String indexName, Title document) throws IOException {
         IndexRequest<Title> request = IndexRequest.of(i -> i
-                .index(name)
+                .index(indexName)
                 .id(null)
                 .document(document)
         );
@@ -86,6 +96,11 @@ public class ElasticConnection {
 
     public boolean deleteIndex(String indexName) throws IOException {
         AcknowledgedResponse response = this.client.indices().delete(i -> i.index(indexName));
+        return response.acknowledged();
+    }
+
+    public boolean createIndex(String indexName) throws IOException {
+        CreateIndexResponse response = this.client.indices().create(createIndexRequest -> createIndexRequest.index(indexName));
         return response.acknowledged();
     }
 }
