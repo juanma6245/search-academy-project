@@ -24,6 +24,9 @@ public class IndexServiceImpl implements IndexService{
 
     @Autowired
     private TSVService TSVService;
+    @Autowired
+    private ElasticConnection elasticConnection;
+
     private static final String INDEX_NAME = "imdb";
     private static final int MAX_LINES = 1000;
     private BufferedReader br;
@@ -53,7 +56,7 @@ public class IndexServiceImpl implements IndexService{
             //System.out.println("Time read: " + (end - start) + "ms");
             JobId jobId = BackgroundJob.create(aJob()
                     .withName("Indexing data")
-                    .<ElasticConnection>withDetails(elastic -> elastic.bulk(INDEX_NAME, json)));
+                    .withDetails(() -> elasticConnection.bulk(INDEX_NAME, json)));
 
             //elasticConnection.bulk(INDEX_NAME, json);
 
@@ -67,8 +70,8 @@ public class IndexServiceImpl implements IndexService{
     }
 
     @Override
-    public boolean deleteIndex(String indexName) {
-        return false;
+    public boolean deleteIndex(String indexName) throws IOException {
+        return this.elasticConnection.deleteIndex(indexName);
     }
 
     @Override

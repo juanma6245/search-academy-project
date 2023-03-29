@@ -1,6 +1,7 @@
 package co.empathy.academy.search.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
@@ -81,5 +82,10 @@ public class ElasticConnection {
                 }
             }
         }
+    }
+
+    public boolean deleteIndex(String indexName) throws IOException {
+        AcknowledgedResponse response = this.client.indices().delete(i -> i.index(indexName));
+        return response.acknowledged();
     }
 }
