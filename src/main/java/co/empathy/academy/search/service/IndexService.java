@@ -8,7 +8,8 @@ public interface IndexService {
 
     boolean createIndex(String indexName) throws IOException;
     boolean deleteIndex(String indexName) throws IOException;
-    void setConfig(String indexName,File configFile);
+    void setConfig(String indexName,File configFile) throws IOException;
+    void setMapping(String indexName,File mappingFile) throws IOException;
     boolean indexExists(String indexName) throws IOException;
 
 }

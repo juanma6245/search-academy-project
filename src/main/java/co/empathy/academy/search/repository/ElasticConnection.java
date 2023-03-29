@@ -21,6 +21,8 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.elasticsearch.client.RestClient;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -106,5 +108,20 @@ public class ElasticConnection {
 
     public boolean indexExists(String indexName) throws IOException {
         return this.client.indices().exists(request -> request.index(indexName)).value();
+    }
+
+    public void setConfig(String indexName, File configFile) throws IOException {
+        this.client.indices().close(request -> request.index(indexName));
+
+        FileInputStream fileInputStream = new FileInputStream(configFile);
+
+        this.client.indices().putSettings(request -> request.withJson(fileInputStream));
+
+        this.client.indices().open(request -> request.index(indexName));
+    }
+
+    public void setMapping(String indexName, File mappingFile) throws IOException {
+        FileInputStream mappingInputStream = new FileInputStream(mappingFile);
+        this.client.indices().putMapping(request -> request.index(indexName).withJson(mappingInputStream));
     }
 }

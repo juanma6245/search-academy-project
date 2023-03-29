@@ -74,8 +74,13 @@ public class IndexServiceImpl implements IndexService{
     }
 
     @Override
-    public void setConfig(String indexName, File configFile) {
+    public void setConfig(String indexName, File configFile) throws IOException {
+        this.elasticConnection.setConfig(indexName, configFile);
+    }
 
+    @Override
+    public void setMapping(String indexName, File mappingFile) throws IOException {
+        this.elasticConnection.setMapping(indexName, mappingFile);
     }
 
     @Override
