@@ -26,8 +26,8 @@ public class IndexServiceImpl implements IndexService{
     @Autowired
     private ElasticConnection elasticConnection;
 
-    private static final String INDEX_NAME = "imdb";
-    private static final int MAX_LINES = 1000;
+    //private static final String INDEX_NAME = "imdb";
+    private static final int MAX_LINES = 5000;
     private BufferedReader br;
     private BufferedReader ar;
     private BufferedReader er;
@@ -39,7 +39,7 @@ public class IndexServiceImpl implements IndexService{
 
 
     @Override
-    public void index(File basic, File aka, File episode, File principal, File rating, File crew) throws IOException {
+    public void index(String indexName, File basic, File aka, File episode, File principal, File rating, File crew) throws IOException {
         this.br = new BufferedReader(new InputStreamReader(new FileInputStream(basic)));
         this.ar = new BufferedReader(new InputStreamReader(new FileInputStream(aka)));
         this.er = new BufferedReader(new InputStreamReader(new FileInputStream(episode)));
@@ -55,7 +55,7 @@ public class IndexServiceImpl implements IndexService{
             //System.out.println("Time read: " + (end - start) + "ms");
             JobId jobId = BackgroundJob.create(aJob()
                     .withName("Indexing data")
-                    .withDetails(() -> elasticConnection.bulk(INDEX_NAME, json)));
+                    .withDetails(() -> elasticConnection.bulk(indexName, json)));
 
             //elasticConnection.bulk(INDEX_NAME, json);
 
@@ -65,6 +65,9 @@ public class IndexServiceImpl implements IndexService{
 
     @Override
     public boolean createIndex(String indexName) throws IOException {
+        if (this.elasticConnection.indexExists(indexName)){
+            this.elasticConnection.deleteIndex(indexName);
+        }
         return this.elasticConnection.createIndex(indexName); //Trows exception when index already exists
     }
 
