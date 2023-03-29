@@ -103,4 +103,8 @@ public class ElasticConnection {
         CreateIndexResponse response = this.client.indices().create(createIndexRequest -> createIndexRequest.index(indexName));
         return response.acknowledged();
     }
+
+    public boolean indexExists(String indexName) throws IOException {
+        return this.client.indices().exists(request -> request.index(indexName)).value();
+    }
 }

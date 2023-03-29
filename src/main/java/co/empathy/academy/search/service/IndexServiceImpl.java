@@ -74,13 +74,13 @@ public class IndexServiceImpl implements IndexService{
     }
 
     @Override
-    public void setConfig(File configFile) {
+    public void setConfig(String indexName, File configFile) {
 
     }
 
     @Override
-    public boolean isIndexExists(String indexName) {
-        return false;
+    public boolean indexExists(String indexName) throws IOException {
+        return this.elasticConnection.indexExists(indexName);
     }
 
     private List<String> _getData() throws IOException {
