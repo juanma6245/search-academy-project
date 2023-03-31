@@ -97,6 +97,12 @@ public class IndexController {
         return new ResponseEntity(response, status);
     }
 
+    /**
+     * Convert a MultipartFile to a temporary file
+     * @param file File to be converted to a temporary file
+     * @return a temporary file
+     * @throws IOException if the file cannot be created
+     */
     private File _getTempFile(MultipartFile file) throws IOException {
         File tempFile = File.createTempFile("temp", ".tmp");
         OutputStream os = new FileOutputStream(tempFile);

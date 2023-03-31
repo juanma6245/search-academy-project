@@ -3,6 +3,7 @@ package co.empathy.academy.search.configuration;
 
 
 
+import co.empathy.academy.search.common.DocumentStorage;
 import co.empathy.academy.search.repository.ElasticConnection;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -44,7 +45,10 @@ public class Config implements AsyncConfigurer {
     public ElasticConnection elasticConnection() {
         return new ElasticConnection(RestClient.builder(new HttpHost(hostname, port)).build());
     }
-
+    @Bean
+    public DocumentStorage documentStorage() {
+        return new DocumentStorage();
+    }
 
     @Bean
     public StorageProvider storageProvider(JobMapper jobMapper) {
