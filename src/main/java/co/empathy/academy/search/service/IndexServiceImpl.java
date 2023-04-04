@@ -1,5 +1,6 @@
 package co.empathy.academy.search.service;
 
+import co.empathy.academy.search.common.DocumentStorage;
 import co.empathy.academy.search.common.TitleReader;
 import co.empathy.academy.search.model.title.*;
 import jakarta.json.Json;
@@ -24,8 +25,13 @@ public class IndexServiceImpl implements IndexService{
 
     @Autowired
     private TSVService TSVService;
-    private static final String INDEX_NAME = "imdb";
-    private static final int MAX_LINES = 1000;
+    @Autowired
+    private ElasticConnection elasticConnection;
+    @Autowired
+    private DocumentStorage documentStorage;
+
+    //private static final String INDEX_NAME = "imdb";
+    private static final int MAX_LINES = 50000;
     private BufferedReader br;
     private BufferedReader ar;
     private BufferedReader er;
@@ -37,7 +43,7 @@ public class IndexServiceImpl implements IndexService{
 
 
     @Override
-    public void index(File basic, File aka, File episode, File principal, File rating, File crew) throws IOException {
+    public void index(String indexName, File basic, File aka, File episode, File principal, File rating, File crew) throws IOException {
         this.br = new BufferedReader(new InputStreamReader(new FileInputStream(basic)));
         this.ar = new BufferedReader(new InputStreamReader(new FileInputStream(aka)));
         this.er = new BufferedReader(new InputStreamReader(new FileInputStream(episode)));
@@ -48,12 +54,13 @@ public class IndexServiceImpl implements IndexService{
         this.reader = new TitleReader(TSVService);
         while(this.endFile == false) {
             //long start = System.currentTimeMillis();
-            List<String> json = this._getData();
+            List<JsonObject> json = this._getData();
+            String key = this.documentStorage.add(json);
             //long end = System.currentTimeMillis();
             //System.out.println("Time read: " + (end - start) + "ms");
             JobId jobId = BackgroundJob.create(aJob()
                     .withName("Indexing data")
-                    .<ElasticConnection>withDetails(elastic -> elastic.bulk(INDEX_NAME, json)));
+                    .withDetails(() -> elasticConnection.bulk(indexName, key)));
 
             //elasticConnection.bulk(INDEX_NAME, json);
 
@@ -62,28 +69,36 @@ public class IndexServiceImpl implements IndexService{
     }
 
     @Override
-    public void createIndex(String indexName) {
-
+    public boolean createIndex(String indexName) throws IOException {
+        if (this.elasticConnection.indexExists(indexName)){
+            this.elasticConnection.deleteIndex(indexName);
+        }
+        return this.elasticConnection.createIndex(indexName); //Trows exception when index already exists
     }
 
     @Override
-    public boolean deleteIndex(String indexName) {
-        return false;
+    public boolean deleteIndex(String indexName) throws IOException {
+        return this.elasticConnection.deleteIndex(indexName); //Trows exception when index not exists
     }
 
     @Override
-    public void setConfig(File configFile) {
-
+    public void setConfig(String indexName, File configFile) throws IOException {
+        this.elasticConnection.setConfig(indexName, configFile);
     }
 
     @Override
-    public boolean isIndexExists(String indexName) {
-        return false;
+    public void setMapping(String indexName, File mappingFile) throws IOException {
+        this.elasticConnection.setMapping(indexName, mappingFile);
     }
 
-    private List<String> _getData() throws IOException {
+    @Override
+    public boolean indexExists(String indexName) throws IOException {
+        return this.elasticConnection.indexExists(indexName);
+    }
+
+    private List<JsonObject> _getData() throws IOException {
         int linesRead = 0;
-        List<String> response = new ArrayList<>();
+        List<JsonObject> response = new ArrayList<>();
 
         while (linesRead < MAX_LINES) {
             JsonObjectBuilder builder = Json.createObjectBuilder();
@@ -104,7 +119,7 @@ public class IndexServiceImpl implements IndexService{
             List<Title> principalData = reader.getList(this.pr, basicData, TSVtype.PRINCIPAL);
             //Build the json
             this._buildFromData(basicData, ratingData, akaData, crew, principalData, builder);
-            response.add(builder.build().toString());
+            response.add(builder.build());
             linesRead++;
         }
 
