@@ -45,9 +45,9 @@ public class IndexController {
             @RequestParam("episode") MultipartFile episodeMultipartFile,
             @RequestParam("principal") MultipartFile principalMultipartFile,
             @RequestParam("rating") MultipartFile ratingMultipartFile,
-            @RequestParam("crew") MultipartFile crewMultipartFile
+            @RequestParam("crew") MultipartFile crewMultipartFile,
             //@RequestParam("config") MultipartFile configMultipartFile,
-            //@RequestParam("mapping") MultipartFile mappingMultipartFile
+            @RequestParam("mapping") MultipartFile mappingMultipartFile
     ) throws IOException {
         System.out.println("Indexing started");
         File basic = this._getTempFile(basicMultipartFile);
@@ -57,12 +57,12 @@ public class IndexController {
         File rating = this._getTempFile(ratingMultipartFile);
         File crew = this._getTempFile(crewMultipartFile);
         //File config = this._getTempFile(configMultipartFile);
-        //File mapping = this._getTempFile(mappingMultipartFile);
+        File mapping = this._getTempFile(mappingMultipartFile);
         System.out.println("Files created");
         //Create index and set configuration and mappings
-        //this.indexService.createIndex(indexName);
+        this.indexService.createIndex(indexName);
         //this.indexService.setConfiguration(indexName, config);
-        //this.indexService.setMappings(indexName, mapping);
+        this.indexService.setMapping(indexName, mapping);
         //System.out.println("Index created and set configuration and mappings");
         JobId indexJob = BackgroundJob.create(aJob()
                 .withName("Start indexing")
