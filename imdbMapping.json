@@ -1,0 +1,86 @@
+{
+    "properties":{
+        "id": {
+            "type":"keyword"
+        },
+        "tconst": {
+            "type":"keyword"
+        },
+        "titleType": {
+            "type":"keyword"
+        },
+        "primaryTitle": {
+            "type":"text",
+            "analyzer": "custom_english_spanish",
+            "search_analyzer": "custom_english_spanish"
+        },
+        "originalTitle": {
+            "type":"keyword"
+        },
+        "isAdult": {
+            "type": "boolean"
+        },
+        "startYear": {
+            "type": "integer"
+        },
+        "endYear": {
+            "type": "integer"
+        },
+        "runtimeMinutes": {
+            "type": "integer"
+        },
+        "genres": {
+            "type": "keyword"
+        },
+        "averageRating": {
+            "type": "float"
+        },
+        "numVotes": {
+            "type": "integer"
+        },
+        "akas": {
+            "type": "nested",
+            "properties": {
+                "title" :{
+                    "type" : "text",
+                    "analyzer" : "custom_english_spanish",
+                    "search_analyzer": "custom_english_spanish"
+                },
+                "region": {
+                    "type": "keyword"
+                },
+                "language": {
+                    "type": "keyword"
+                },
+                "isOriginalTitle": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "directors": {
+            "type" : "nested",
+            "properties": {
+                "nconst": {
+                    "type": "keyword"
+                }
+            }
+        },
+        "starring": {
+            "type": "nested",
+            "properties":{
+                "name": {
+                    "type": "nested",
+                    "properties":{
+                        "nconst": {
+                            "type": "keyword"
+                        }
+                    }
+                },
+                "characters": {
+                    "type" : "keyword"
+                }
+            }
+        }
+
+    }
+}
