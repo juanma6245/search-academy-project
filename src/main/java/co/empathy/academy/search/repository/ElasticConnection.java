@@ -158,7 +158,7 @@ public class ElasticConnection {
 
         FileInputStream fileInputStream = new FileInputStream(configFile);
 
-        this.client.indices().putSettings(request -> request.withJson(fileInputStream));
+        this.client.indices().putSettings(request -> request.index(indexName).withJson(fileInputStream));
 
         this.client.indices().open(request -> request.index(indexName));
     }

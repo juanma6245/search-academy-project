@@ -11,7 +11,8 @@
         },
         "primaryTitle": {
             "type":"text",
-            "analyzer": "standard"
+            "analyzer": "custom_english_spanish",
+            "search_analyzer": "custom_english_spanish"
         },
         "originalTitle": {
             "type":"keyword"
@@ -42,7 +43,8 @@
             "properties": {
                 "title" :{
                     "type" : "text",
-                    "analyzer" : "standard"
+                    "analyzer" : "custom_english_spanish",
+                    "search_analyzer": "custom_english_spanish"
                 },
                 "region": {
                     "type": "keyword"
