@@ -3,12 +3,15 @@ package co.empathy.academy.search.service;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Service to index the files into elasticsearch
+ */
 public interface IndexService {
 
     /**
      * Indexes the files into elasticsearch in a bulk request with the given index name. If the index does not exist, it will be created.
-     * The index will be created with the default configuration and mapping.
-     * The bulk request will be split in chunks of x documents.
+     * The index will be created with the default configuration and mapping if it doesn't exist.
+     * The bulk request will be split in chunks of MAX_LINES documents.
      * @param indexName name of the index
      * @param basic    basics file
      * @param aka     akas file
