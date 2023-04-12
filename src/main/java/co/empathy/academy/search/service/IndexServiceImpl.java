@@ -97,13 +97,18 @@ public class IndexServiceImpl implements IndexService{
     public boolean indexExists(String indexName) throws IOException {
         return this.elasticConnection.indexExists(indexName);
     }
-
+    
     @Override
     public Map<String, IndexState> getIndexes() throws IOException {
         Map<String, IndexState> indices = this.elasticConnection.getClient().indices().get(request -> request.index("*")).result();
         return indices;
     }
 
+    /**
+     * Generates a list of json objects with the data read from the readers and a maximum of MAX_LINES
+     * @return List of json objects with the data read from the readers
+     * @throws IOException if there is an error reading from readers
+     */
     private List<JsonObject> _getData() throws IOException {
         int linesRead = 0;
         List<JsonObject> response = new ArrayList<>();
@@ -134,6 +139,15 @@ public class IndexServiceImpl implements IndexService{
         return response;
     }
 
+    /**
+     * Builds a json object into the builder with the data from the parameters
+     * @param basicData Basic data of the title
+     * @param ratingData Rating data of the title
+     * @param akaData Aka data of the title
+     * @param crew Crew data of the title
+     * @param principalData Principal data of the title
+     * @param builder Builder to build the json object
+     */
     private void _buildFromData(Basic basicData, Rating ratingData, List<Title> akaData, Crew crew, List<Title> principalData, JsonObjectBuilder builder) {
         builder.add("id", basicData.getTconst());
         builder.add("tconst", basicData.getTconst());
