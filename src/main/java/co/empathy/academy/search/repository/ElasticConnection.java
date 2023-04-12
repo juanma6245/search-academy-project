@@ -3,11 +3,9 @@ package co.empathy.academy.search.repository;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
 import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
-import co.elastic.clients.elasticsearch.core.BulkRequest;
-import co.elastic.clients.elasticsearch.core.BulkResponse;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
-import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.elasticsearch.indices.IndexSettings;
@@ -17,7 +15,9 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import co.elastic.clients.util.ObjectBuilder;
 import co.empathy.academy.search.common.DocumentStorage;
+import co.empathy.academy.search.model.ResponseDocument;
 import co.empathy.academy.search.model.title.Title;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.elasticsearch.client.RestClient;
@@ -172,5 +172,20 @@ public class ElasticConnection {
     public void setMapping(String indexName, File mappingFile) throws IOException {
         FileInputStream mappingInputStream = new FileInputStream(mappingFile);
         this.client.indices().putMapping(request -> request.index(indexName).withJson(mappingInputStream));
+    }
+
+    public SearchResponse search(String indexName, String query) throws IOException {
+        SearchResponse<ResponseDocument> response = this.client.search(request -> request
+                        .index(indexName)
+                        .query(q -> q
+                                .match(t -> t
+                                        .field("primaryTitle")
+                                        .query(query)
+                                )
+                        ),
+                ResponseDocument.class
+        );
+
+        return response;
     }
 }
