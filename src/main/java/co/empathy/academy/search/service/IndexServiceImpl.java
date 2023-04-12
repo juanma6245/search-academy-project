@@ -130,9 +130,11 @@ public class IndexServiceImpl implements IndexService{
             Crew crew = reader.getCrew(this.cr);
             //Read principal data to get actors
             List<Title> principalData = reader.getList(this.pr, basicData, TSVtype.PRINCIPAL);
-            //Build the json
-            this._buildFromData(basicData, ratingData, akaData, crew, principalData, builder);
-            response.add(builder.build());
+            if (!basicData.isAdult()) {
+                //Build the json
+                this._buildFromData(basicData, ratingData, akaData, crew, principalData, builder);
+                response.add(builder.build());
+            }
             linesRead++;
         }
 
