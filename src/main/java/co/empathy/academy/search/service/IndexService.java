@@ -1,7 +1,10 @@
 package co.empathy.academy.search.service;
 
+import co.elastic.clients.elasticsearch.indices.IndexState;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Service to index the files into elasticsearch
@@ -58,4 +61,5 @@ public interface IndexService {
      */
     boolean indexExists(String indexName) throws IOException;
 
+    Map<String, IndexState> getIndexes() throws IOException;
 }
