@@ -28,6 +28,20 @@ public class IndexController {
 
     @Autowired
     private IndexService indexService;
+
+    @GetMapping("")
+    @Operation(summary = "Get all indexes",
+            description = "Get all indexes",
+            tags = {"Index"},
+            operationId = "getIndexes",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
+    public ResponseEntity getIndexes() throws IOException {
+        return ResponseEntity.ok(this.indexService.getIndexes());
+    }
+
     @PostMapping("{indexName}")
     @Operation(summary = "Index the data",
             description = "Index the data",

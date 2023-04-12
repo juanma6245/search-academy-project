@@ -1,5 +1,6 @@
 package co.empathy.academy.search.service;
 
+import co.elastic.clients.elasticsearch.indices.IndexState;
 import co.empathy.academy.search.common.DocumentStorage;
 import co.empathy.academy.search.common.TitleReader;
 import co.empathy.academy.search.model.title.*;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.jobrunr.scheduling.JobBuilder.aJob;
 
@@ -94,6 +96,12 @@ public class IndexServiceImpl implements IndexService{
     @Override
     public boolean indexExists(String indexName) throws IOException {
         return this.elasticConnection.indexExists(indexName);
+    }
+
+    @Override
+    public Map<String, IndexState> getIndexes() throws IOException {
+        Map<String, IndexState> indices = this.elasticConnection.getClient().indices().get(request -> request.index("*")).result();
+        return indices;
     }
 
     private List<JsonObject> _getData() throws IOException {
