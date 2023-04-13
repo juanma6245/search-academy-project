@@ -37,7 +37,7 @@
                 "replace_": {
                     "type": "mapping",
                     "mappings": [
-                        "_ =>  "
+                        "_ => -"
                     ]
                 }
             },
@@ -47,6 +47,7 @@
                     "tokenizer": "standard",
                     "filter": [
                         "asciifolding",
+                        "lowercase",
                         "synonym_filter",
                         "word_delimiter_graph",
                         "lowercase",
