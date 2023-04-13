@@ -22,7 +22,8 @@
                     "type": "synonym",
                     "synonyms": [
                       "spiderman => spiderMan",
-                      "theavengers => theAvengers" 
+                      "theavengers => theAvengers",
+                      "batman => batMan"
                     ]
                   }
             },
@@ -31,6 +32,12 @@
                     "type": "mapping",
                     "mappings": [
                         "& => and"
+                    ]
+                },
+                "replace_": {
+                    "type": "mapping",
+                    "mappings": [
+                        "_ =>  "
                     ]
                 }
             },
@@ -48,7 +55,8 @@
                         
                     ],
                     "char_filter": [
-                        "replace_and"
+                        "replace_and",
+                        "replace_"
                     ]
                 }
             }
