@@ -2,23 +2,20 @@ package co.empathy.academy.search.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
-import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
-import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
-import co.elastic.clients.elasticsearch.indices.IndexSettings;
-import co.elastic.clients.elasticsearch.transform.Settings;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import co.elastic.clients.util.ObjectBuilder;
 import co.empathy.academy.search.common.DocumentStorage;
 import co.empathy.academy.search.model.ResponseDocument;
 import co.empathy.academy.search.model.title.Title;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
+import java.util.*;
 
 /**
  * Class to connect to elasticSearch.
@@ -175,17 +167,90 @@ public class ElasticConnection {
     }
 
     public SearchResponse search(String indexName, String query) throws IOException {
+        int size = 100;
+        int from =0;
+        MultiMatchQuery nameQuery = MultiMatchQuery.of(q -> q
+                .query(query)
+                .fields("primaryTitle", "originalTitle")
+                .type(TextQueryType.BestFields)
+        );
+        MatchQuery akaQuery = MatchQuery.of(q -> q
+                .field("akas.title")
+                .query(query)
+        );
+
+        Map<String, Aggregation> aggregationMap = this._getBasicsAggregations();
+
         SearchResponse<ResponseDocument> response = this.client.search(request -> request
                         .index(indexName)
-                        .query(q -> q
-                                .match(t -> t
-                                        .field("primaryTitle")
-                                        .query(query)
-                                )
-                        ),
+                        .size(size)
+                        .from(from)
+                        .query(nameQuery._toQuery())
+                        .aggregations(aggregationMap),
                 ResponseDocument.class
         );
 
         return response;
+    }
+
+    private Map<String, Aggregation> _getBasicsAggregations() {
+        Aggregation aggregationMinRating = Aggregation.of(a -> a
+                .min(m -> m
+                        .field("averageRating")
+                )
+        );
+        Aggregation aggregationMaxRating = Aggregation.of(a -> a
+                .max(m -> m
+                        .field("averageRating")
+                )
+        );
+        Aggregation aggregationGenres = Aggregation.of(a -> a
+                .terms(t -> t
+                        .field("genres")
+                )
+        );
+        /*Aggregation directorsNconst = Aggregation.of(a -> a
+                .terms(t -> t
+                        .field("directors.nconst")
+                )
+        );
+        Aggregation aggregationDirectors = Aggregation.of(a -> a
+                .nested(n -> n
+                        .path("directors"))
+                .aggregations(directorsNconst.aggregations())
+        );*/
+
+        Aggregation aggregationMinReleaseYear = Aggregation.of(a -> a
+                .min(m -> m
+                        .field("startYear")
+                )
+        );
+        Aggregation aggregationMaxReleaseYear = Aggregation.of(a -> a
+                .max(m -> m
+                        .field("startYear")
+                )
+        );
+        Aggregation aggregationMinDuration = Aggregation.of(a -> a
+                .min(m -> m
+                        .field("runtimeMinutes")
+                )
+        );
+        Aggregation aggregationMaxDuration = Aggregation.of(a -> a
+                .max(m -> m
+                        .field("runtimeMinutes")
+                )
+        );
+
+        Map<String, Aggregation> aggregationMap = new HashMap<>();
+        aggregationMap.put("minRating", aggregationMinRating);
+        aggregationMap.put("maxRating", aggregationMaxRating);
+        aggregationMap.put("genres", aggregationGenres);
+        //aggregationMap.put("directors", aggregationDirectors);
+        aggregationMap.put("minReleaseYear", aggregationMinReleaseYear);
+        aggregationMap.put("maxReleaseYear", aggregationMaxReleaseYear);
+        aggregationMap.put("minDuration", aggregationMinDuration);
+        aggregationMap.put("maxDuration", aggregationMaxDuration);
+
+        return aggregationMap;
     }
 }
