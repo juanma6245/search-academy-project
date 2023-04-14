@@ -33,8 +33,8 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class Config implements AsyncConfigurer {
 
-    //private static final String hostname = "elasticsearch";
-    private static final String hostname = "localhost";
+    private static final String hostname = "elasticsearch";
+    //private static final String hostname = "localhost";
     private static final int port = 9200;
 
     @Autowired
@@ -52,8 +52,8 @@ public class Config implements AsyncConfigurer {
 
     @Bean
     public StorageProvider storageProvider(JobMapper jobMapper) {
-        //InMemoryStorageProvider storageProvider = new InMemoryStorageProvider();
-        MongoDBStorageProvider storageProvider = new MongoDBStorageProvider(mongoClient);
+        InMemoryStorageProvider storageProvider = new InMemoryStorageProvider();
+        //MongoDBStorageProvider storageProvider = new MongoDBStorageProvider(mongoClient);
         storageProvider.setJobMapper(jobMapper);
         return storageProvider;
     }
