@@ -42,7 +42,7 @@
                 }
             },
             "analyzer": {
-                "custom_english_spanish": {
+                "custom_english": {
                     "type": "custom",
                     "tokenizer": "standard",
                     "filter": [
@@ -51,8 +51,7 @@
                         "synonym_filter",
                         "word_delimiter_graph",
                         "lowercase",
-                        "english_stop",
-                        "spanish_stop"
+                        "english_stop"
                         
                     ],
                     "char_filter": [
