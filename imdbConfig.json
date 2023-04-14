@@ -22,6 +22,7 @@
                     "type": "synonym",
                     "synonyms": [
                       "spiderman => spiderMan",
+                      "Spiderman => spiderMan",
                       "theavengers => theAvengers",
                       "batman => batMan"
                     ]
@@ -47,9 +48,9 @@
                     "tokenizer": "standard",
                     "filter": [
                         "asciifolding",
-                        "lowercase",
                         "synonym_filter",
                         "word_delimiter_graph",
+                        "shingle",
                         "lowercase",
                         "english_stop"
                         
