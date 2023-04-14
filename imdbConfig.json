@@ -26,18 +26,6 @@
                         "theavengers => theAvengers",
                         "batman => batMan"
                     ]
-                },
-                "shingle_filter": {
-                    "type": "shingle",
-                    "max_shingle_size": 3,
-                    "min_shingle_size": 2,
-                    "output_unigrams": true,
-                    "token_separator": " "
-                },
-                "autocomplete_filter": {
-                    "type": "edge_ngram",
-                    "min_gram": 1,
-                    "max_gram": 20
                 }
             },
             "char_filter": {
@@ -60,23 +48,16 @@
                     "tokenizer": "standard",
                     "filter": [
                         "asciifolding",
-                        "english_stop",
                         "synonym_filter",
                         "word_delimiter_graph",
-                        "shingle_filter",
-                        "lowercase"
+                        "shingle",
+                        "lowercase",
+                        "english_stop"
+
                     ],
                     "char_filter": [
                         "replace_and",
                         "replace_"
-                    ]
-                },
-                "auto": {
-                    "type": "custom",
-                    "tokenizer": "standard",
-                    "filter": [
-                        "lowercase",
-                        "autocomplete_filter"
                     ]
                 }
             }

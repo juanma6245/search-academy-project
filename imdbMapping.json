@@ -12,17 +12,7 @@
         "primaryTitle": {
             "type":"text",
             "analyzer": "custom_english",
-            "search_analyzer": "custom_english",
-            "fields": {
-                "keyword": {
-                    "type": "keyword"
-                },
-                "auto": {
-                    "type": "completion",
-                    "analyzer": "auto",
-                    "search_analyzer": "standard"
-                }
-            }
+            "search_analyzer": "custom_english"
         },
         "originalTitle": {
             "type":"keyword"
