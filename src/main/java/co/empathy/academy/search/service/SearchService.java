@@ -3,9 +3,11 @@ package co.empathy.academy.search.service;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.search.exception.NoSearchResultException;
+import co.empathy.academy.search.model.Filter;
 import co.empathy.academy.search.model.ResponseDocument;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface SearchService {
     /**
@@ -16,7 +18,7 @@ public interface SearchService {
      * @return list of documents that match the query
      * @throws IOException if the connection to elasticSearch fails
      */
-    SearchResponse<ResponseDocument> search(String indexName, String query) throws IOException, NoSearchResultException;
+    SearchResponse<ResponseDocument> search(String indexName, String query, List<Filter> filters) throws IOException, NoSearchResultException;
 
     /**
      * Search for a document in elasticSearch that match the id provided in parameter

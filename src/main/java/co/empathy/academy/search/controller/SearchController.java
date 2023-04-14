@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.search.exception.NoSearchResultException;
+import co.empathy.academy.search.model.Filter;
 import co.empathy.academy.search.model.ResponseDocument;
 import co.empathy.academy.search.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.json.*;
-import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("")
@@ -45,7 +44,10 @@ public class SearchController {
             })
     @GetMapping("")
     public ResponseEntity search(@RequestParam("query") String query) throws IOException, NoSearchResultException, ParseException {
-        SearchResponse<ResponseDocument> result = this.searchService.search(INDEX_NAME, query);
+        List<Filter> filters = new ArrayList<>();
+        filters.add(new Filter(Filter.TYPE.TERM,"titleType", "movie"));
+        filters.add(new Filter(Filter.TYPE.RANGE,"startYear", "1900"));
+        SearchResponse<ResponseDocument> result = this.searchService.search(INDEX_NAME, query, filters);
         List<ResponseDocument> documents = new ArrayList<>();
         for (Hit<ResponseDocument> hit : result.hits().hits()) {
             documents.add(hit.source());
