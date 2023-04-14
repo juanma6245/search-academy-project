@@ -22,7 +22,8 @@
                     "type": "synonym",
                     "synonyms": [
                       "spiderman => spiderMan",
-                      "theavengers => theAvengers" 
+                      "theavengers => theAvengers",
+                      "batman => batMan"
                     ]
                   }
             },
@@ -32,23 +33,30 @@
                     "mappings": [
                         "& => and"
                     ]
+                },
+                "replace_": {
+                    "type": "mapping",
+                    "mappings": [
+                        "_ => -"
+                    ]
                 }
             },
             "analyzer": {
-                "custom_english_spanish": {
+                "custom_english": {
                     "type": "custom",
                     "tokenizer": "standard",
                     "filter": [
                         "asciifolding",
+                        "lowercase",
                         "synonym_filter",
                         "word_delimiter_graph",
                         "lowercase",
-                        "english_stop",
-                        "spanish_stop"
+                        "english_stop"
                         
                     ],
                     "char_filter": [
-                        "replace_and"
+                        "replace_and",
+                        "replace_"
                     ]
                 }
             }
