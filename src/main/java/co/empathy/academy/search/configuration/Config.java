@@ -33,8 +33,8 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class Config implements AsyncConfigurer {
 
-    private static final String hostname = "elasticsearch";
-    //private static final String hostname = "localhost";
+    private static final String elasticsearch = "elasticsearch";
+    private static final String hostname = "localhost";
     private static final int port = 9200;
 
     @Autowired
@@ -43,7 +43,7 @@ public class Config implements AsyncConfigurer {
 
     @Bean
     public ElasticConnection elasticConnection() {
-        return new ElasticConnection(RestClient.builder(new HttpHost(hostname, port)).build());
+        return new ElasticConnection(RestClient.builder(new HttpHost(hostname, port), new HttpHost(elasticsearch, port)).build());
     }
     @Bean
     public DocumentStorage documentStorage() {
