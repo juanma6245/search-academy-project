@@ -15,11 +15,9 @@ import jakarta.json.*;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.processing.Filer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +41,24 @@ public class SearchController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             })
     @GetMapping("")
-    public ResponseEntity search(@RequestParam("query") String query) throws IOException, NoSearchResultException, ParseException {
+    public ResponseEntity search(@RequestParam("query") String query,
+                                 @RequestParam(value = "titleType", required = false, defaultValue = "movie") String titleTypeString,
+                                 @RequestParam(value = "startYear", required = false) String startYearString,
+                                 @RequestParam(value = "minMinutes", required = false) String minMinutesString,
+                                 @RequestParam(value = "genres", required = false) String[] genres) throws IOException, NoSearchResultException, ParseException {
         List<Filter> filters = new ArrayList<>();
-        filters.add(new Filter(Filter.TYPE.TERM,"titleType", "movie"));
-        filters.add(new Filter(Filter.TYPE.RANGE,"startYear", "1900"));
+        filters.add(new Filter(Filter.TYPE.TERM,"titleType", titleTypeString));
+        if (startYearString != null) {
+            filters.add(new Filter(Filter.TYPE.RANGE, "startYear", startYearString));
+        }
+        if (minMinutesString != null) {
+            filters.add(new Filter(Filter.TYPE.RANGE,"runtimeMinutes", minMinutesString));
+        }
+        if (genres != null) {
+            for (String genre : genres) {
+                filters.add(new Filter(Filter.TYPE.TERM,"genres", genre));
+            }
+        }
         SearchResponse<ResponseDocument> result = this.searchService.search(INDEX_NAME, query, filters);
         List<ResponseDocument> documents = new ArrayList<>();
         for (Hit<ResponseDocument> hit : result.hits().hits()) {
