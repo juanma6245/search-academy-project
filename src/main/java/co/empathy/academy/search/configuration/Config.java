@@ -5,12 +5,6 @@ package co.empathy.academy.search.configuration;
 
 import co.empathy.academy.search.common.DocumentStorage;
 import co.empathy.academy.search.repository.ElasticConnection;
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.ServerApi;
-import com.mongodb.ServerApiVersion;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.jobrunr.configuration.JobRunr;
@@ -37,8 +31,6 @@ public class Config implements AsyncConfigurer {
     private static final String hostname = "localhost";
     private static final int port = 9200;
 
-    @Autowired
-    private MongoClient mongoClient;
 
 
     @Bean
