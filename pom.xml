@@ -67,10 +67,10 @@
 			<artifactId>jobrunr-spring-boot-2-starter</artifactId> <!-- replace x with your Spring Boot version -->
 			<version>${jobrunr.version}</version>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
-		</dependency>
+		</dependency>-->
 		<!--<dependency>
 			<groupId>co.empathy.academy</groupId>
 			<artifactId>ElasticSearchConnection</artifactId>
