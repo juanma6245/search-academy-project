@@ -164,9 +164,7 @@ public class ElasticConnection {
         this.client.indices().putMapping(request -> request.index(indexName).withJson(mappingInputStream));
     }
 
-    public SearchResponse search(String indexName, String query, BoolQuery.Builder filter) throws IOException {
-        int size = 100;
-        int from =0;
+    public SearchResponse search(String indexName, String query,int size, int from, BoolQuery.Builder filter) throws IOException {
         List<Query> listQuery = new ArrayList<>();
         BoolQuery.Builder boolQuery = new BoolQuery.Builder();
         MultiMatchQuery nameQuery = MultiMatchQuery.of(q -> q
@@ -174,14 +172,15 @@ public class ElasticConnection {
                 .fields("primaryTitle", "originalTitle")
                 .type(TextQueryType.BestFields)
         );
-        listQuery.add(nameQuery._toQuery());
-        listQuery.add(filter.build()._toQuery());
-        boolQuery.must(listQuery);//If not must the filtering process changes the order of the results
-        MatchQuery akaQuery = MatchQuery.of(q -> q
-                .field("akas.title")
+        MatchPhrasePrefixQuery prefixQuery = MatchPhrasePrefixQuery.of(q -> q
+                .field("primaryTitle")
                 .query(query)
         );
 
+        listQuery.add(nameQuery._toQuery());
+        listQuery.add(filter.build()._toQuery());
+        boolQuery.must(listQuery);//If not must the filtering process changes the order of the results
+        boolQuery.should(prefixQuery._toQuery()); //Should contain the prefix query to improve the results, example: "The Lord of the Rings" -> "The Lord of the Rings: The Fellowship of the Ring"
         Map<String, Aggregation> aggregationMap = this._getBasicsAggregations();
         SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
         request.query(boolQuery.build()._toQuery());

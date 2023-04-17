@@ -18,7 +18,7 @@ public interface SearchService {
      * @return list of documents that match the query
      * @throws IOException if the connection to elasticSearch fails
      */
-    SearchResponse<ResponseDocument> search(String indexName, String query, List<Filter> filters) throws IOException, NoSearchResultException;
+    SearchResponse<ResponseDocument> search(String indexName, String query,int num, int page, List<Filter> filters) throws IOException, NoSearchResultException;
 
     /**
      * Search for a document in elasticSearch that match the id provided in parameter

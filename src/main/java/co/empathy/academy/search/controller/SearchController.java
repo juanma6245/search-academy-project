@@ -45,7 +45,11 @@ public class SearchController {
                                  @RequestParam(value = "titleType", required = false, defaultValue = "movie") String titleTypeString,
                                  @RequestParam(value = "startYear", required = false) String startYearString,
                                  @RequestParam(value = "minMinutes", required = false) String minMinutesString,
-                                 @RequestParam(value = "genres", required = false) String[] genres) throws IOException, NoSearchResultException, ParseException {
+                                 @RequestParam(value = "genres", required = false) String[] genres,
+                                 @RequestParam(value = "size", required = false, defaultValue = "100") int numDocs,
+                                 @RequestParam(value = "page", defaultValue = "0") int page) throws IOException, NoSearchResultException, ParseException {
+
+        //Add filters
         List<Filter> filters = new ArrayList<>();
         filters.add(new Filter(Filter.TYPE.TERM,"titleType", titleTypeString));
         if (startYearString != null) {
@@ -59,14 +63,17 @@ public class SearchController {
                 filters.add(new Filter(Filter.TYPE.TERM,"genres", genre));
             }
         }
-        SearchResponse<ResponseDocument> result = this.searchService.search(INDEX_NAME, query, filters);
+        //Search request
+        SearchResponse<ResponseDocument> result = this.searchService.search(INDEX_NAME, query, numDocs, page, filters);
+        //Parse response
         List<ResponseDocument> documents = new ArrayList<>();
         for (Hit<ResponseDocument> hit : result.hits().hits()) {
             documents.add(hit.source());
         }
-        List<Map<String, Object>> aggs = new ArrayList<>();
-        Map<String, Aggregate> aggsMap = result.aggregations();
 
+        List<Map<String, Object>> aggs = new ArrayList<>();
+        //Parse aggregations
+        Map<String, Aggregate> aggsMap = result.aggregations();
         for (Map.Entry<String, Aggregate> entry: aggsMap.entrySet()) {
             Object value = null;
             if (entry.getValue().isMin()){

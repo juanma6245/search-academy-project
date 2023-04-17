@@ -21,9 +21,10 @@ public class SearchServiceImpl implements SearchService{
     @Autowired
     private ElasticConnection elasticConnection;
     @Override
-    public SearchResponse<ResponseDocument> search(String indexName, String query, List<Filter> filters) throws IOException, NoSearchResultException {
+    public SearchResponse<ResponseDocument> search(String indexName, String query,int num, int page, List<Filter> filters) throws IOException, NoSearchResultException {
         BoolQuery.Builder filter = this._buildFilter(filters);
-        SearchResponse<ResponseDocument> result = elasticConnection.search(indexName, query, filter);
+        page = page * num;
+        SearchResponse<ResponseDocument> result = elasticConnection.search(indexName, query, num, page, filter);
         if (result.hits().hits().size() == 0) {
             throw new NoSearchResultException();
         }
