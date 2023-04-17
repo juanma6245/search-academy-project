@@ -64,20 +64,37 @@ public class SearchController {
         for (Hit<ResponseDocument> hit : result.hits().hits()) {
             documents.add(hit.source());
         }
-        JsonArrayBuilder aggsBuilder = Json.createArrayBuilder();
+        List<Map<String, Object>> aggs = new ArrayList<>();
         Map<String, Aggregate> aggsMap = result.aggregations();
 
         for (Map.Entry<String, Aggregate> entry: aggsMap.entrySet()) {
-            JsonObject agg = Json.createObjectBuilder()
-                    .add("name", entry.getKey())
-                    .add("value", (entry.getValue().toString().replace("Aggregate: ", "")))
-                    .build();
-            aggsBuilder.add(agg);
+            Object value = null;
+            if (entry.getValue().isMin()){
+                value = entry.getValue().min().value();
+            } else if (entry.getValue().isMax()) {
+                value = entry.getValue().max().value();
+            } else if (entry.getValue().isSterms()) {
+                value = new ArrayList<>();
+                for (var bucket : entry.getValue().sterms().buckets().array()) {
+                    Map<String, Object> bucketMap = Map.of(
+                            "key", bucket.key().stringValue()
+                            ,"docCount", bucket.docCount()
+                    );
+                    ((List) value).add(bucketMap);
+                }
+            } else {
+                value = entry.getValue();
+            }
+            Map<String, Object> aggMap = Map.of(
+                    "name", entry.getKey()
+                    ,"value", value
+            );
+            aggs.add(aggMap);
         }
         Map<String, Object> response = Map.of(
                 "total", documents.size()
                 ,"hits", documents
-                ,"aggs", aggsBuilder.build()
+                ,"aggs", aggs
         );
 
         return ResponseEntity.ok(response);
