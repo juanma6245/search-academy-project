@@ -21,12 +21,12 @@
                 "synonym_filter": {
                     "type": "synonym",
                     "synonyms": [
-                      "spiderman => spiderMan",
-                      "Spiderman => spiderMan",
-                      "theavengers => theAvengers",
-                      "batman => batMan"
+                        "spiderman => spiderMan",
+                        "Spiderman => spiderMan",
+                        "theavengers => theAvengers",
+                        "batman => batMan"
                     ]
-                  }
+                }
             },
             "char_filter": {
                 "replace_and": {
@@ -53,7 +53,7 @@
                         "shingle",
                         "lowercase",
                         "english_stop"
-                        
+
                     ],
                     "char_filter": [
                         "replace_and",
