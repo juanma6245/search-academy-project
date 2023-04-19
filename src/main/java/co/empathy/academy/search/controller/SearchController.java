@@ -11,13 +11,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.json.*;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.processing.Filer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +42,9 @@ public class SearchController {
     public ResponseEntity search(@RequestParam("query") String query,
                                  @RequestParam(value = "titleType", required = false, defaultValue = "movie") String titleTypeString,
                                  @RequestParam(value = "startYear", required = false) String startYearString,
+                                 @RequestParam(value = "endYear", required = false) String endYearString,
                                  @RequestParam(value = "minMinutes", required = false) String minMinutesString,
+                                    @RequestParam(value = "maxMinutes", required = false) String maxMinutesString,
                                  @RequestParam(value = "genres", required = false) String[] genres,
                                  @RequestParam(value = "size", required = false, defaultValue = "100") int numDocs,
                                  @RequestParam(value = "page", defaultValue = "0") int page) throws IOException, NoSearchResultException, ParseException {
@@ -53,10 +53,16 @@ public class SearchController {
         List<Filter> filters = new ArrayList<>();
         filters.add(new Filter(Filter.TYPE.TERM,"titleType", titleTypeString));
         if (startYearString != null) {
-            filters.add(new Filter(Filter.TYPE.RANGE, "startYear", startYearString));
+            filters.add(new Filter(Filter.TYPE.MIN, "startYear", startYearString));
+        }
+        if (endYearString != null) {
+            filters.add(new Filter(Filter.TYPE.MAX, "startYear", endYearString));
         }
         if (minMinutesString != null) {
-            filters.add(new Filter(Filter.TYPE.RANGE,"runtimeMinutes", minMinutesString));
+            filters.add(new Filter(Filter.TYPE.MIN,"runtimeMinutes", minMinutesString));
+        }
+        if (maxMinutesString != null) {
+            filters.add(new Filter(Filter.TYPE.MAX,"runtimeMinutes", maxMinutesString));
         }
         if (genres != null) {
             for (String genre : genres) {

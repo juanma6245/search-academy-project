@@ -1,7 +1,6 @@
 package co.empathy.academy.search.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
@@ -35,11 +34,19 @@ public class SearchServiceImpl implements SearchService{
         BoolQuery.Builder boolQuery = new BoolQuery.Builder();
         for (Filter filter : filters) {
             switch (filter.getType()) {
-                case RANGE:
+                case MIN:
                     boolQuery.filter(f -> f
                             .range(r -> r
                                     .field(filter.getKey())
                                     .gte(JsonData.fromJson(filter.getValue()))
+                                    .boost(0.0F)
+                            ));
+                    break;
+                case MAX:
+                    boolQuery.filter(f -> f
+                            .range(r -> r
+                                    .field(filter.getKey())
+                                    .lte(JsonData.fromJson(filter.getValue()))
                                     .boost(0.0F)
                             ));
                     break;

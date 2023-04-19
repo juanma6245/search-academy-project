@@ -3,7 +3,8 @@ package co.empathy.academy.search.model;
 public class Filter {
      public enum TYPE {
          TERM,
-        RANGE,
+         MIN,
+         MAX,
         GENRE
     }
     private TYPE type;
