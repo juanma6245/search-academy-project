@@ -44,7 +44,7 @@ public class SearchController {
                                  @RequestParam(value = "startYear", required = false) String startYearString,
                                  @RequestParam(value = "endYear", required = false) String endYearString,
                                  @RequestParam(value = "minMinutes", required = false) String minMinutesString,
-                                    @RequestParam(value = "maxMinutes", required = false) String maxMinutesString,
+                                 @RequestParam(value = "maxMinutes", required = false) String maxMinutesString,
                                  @RequestParam(value = "genres", required = false) String[] genres,
                                  @RequestParam(value = "size", required = false, defaultValue = "100") int numDocs,
                                  @RequestParam(value = "page", defaultValue = "0") int page) throws IOException, NoSearchResultException, ParseException {
@@ -108,6 +108,43 @@ public class SearchController {
                 "total", documents.size()
                 ,"hits", documents
                 ,"aggs", aggs
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get trending films in elasticSearch",
+            tags = {"Search"},
+            operationId = "trending",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK",
+                            content =  @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDocument.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "404", description = "Not Found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            })
+    @GetMapping("/trending")
+    public ResponseEntity trending(@RequestParam(value = "size", required = false, defaultValue = "20") int numDocs,
+                                   @RequestParam(value = "page", defaultValue = "0") int page,
+                                   @RequestParam(value = "minNumVotes", required = false, defaultValue = "100") String minNumVotes,
+                                   @RequestParam(value = "titleType", required = false, defaultValue = "movie") String titleTypeString) throws IOException, NoSearchResultException, ParseException {
+        //Add filters
+        List<Filter> filters = new ArrayList<>();
+        filters.add(new Filter(Filter.TYPE.TERM,"titleType", titleTypeString));
+        if (minNumVotes != null) {
+            filters.add(new Filter(Filter.TYPE.MIN, "numVotes", minNumVotes));
+        }
+        //Search request
+        SearchResponse<ResponseDocument> result = this.searchService.trending(INDEX_NAME, numDocs, page, filters);
+        //Parse response
+        List<ResponseDocument> documents = new ArrayList<>();
+        for (Hit<ResponseDocument> hit : result.hits().hits()) {
+            documents.add(hit.source());
+        }
+
+        Map<String, Object> response = Map.of(
+                "total", documents.size()
+                ,"hits", documents
         );
 
         return ResponseEntity.ok(response);
