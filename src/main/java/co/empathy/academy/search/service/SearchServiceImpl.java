@@ -1,7 +1,6 @@
 package co.empathy.academy.search.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
@@ -24,8 +23,15 @@ public class SearchServiceImpl implements SearchService{
     public SearchResponse<ResponseDocument> search(String indexName, String query,int num, int page, List<Filter> filters) throws IOException, NoSearchResultException {
         BoolQuery.Builder filter = this._buildFilter(filters);
         page = page * num;
-        SearchResponse<ResponseDocument> result = elasticConnection.search(indexName, query, num, page, filter);
-        if (result.hits().hits().size() == 0) {
+        SearchResponse<ResponseDocument> result;
+        if (query.isBlank()){
+            num = 0;
+            result = elasticConnection.getAggregations(indexName);
+        } else {
+            result = elasticConnection.search(indexName, query, num, page, filter);
+        }
+
+        if (result.hits().hits().size() == 0 && num != 0){
             throw new NoSearchResultException();
         }
         return result;
@@ -35,11 +41,19 @@ public class SearchServiceImpl implements SearchService{
         BoolQuery.Builder boolQuery = new BoolQuery.Builder();
         for (Filter filter : filters) {
             switch (filter.getType()) {
-                case RANGE:
+                case MIN:
                     boolQuery.filter(f -> f
                             .range(r -> r
                                     .field(filter.getKey())
                                     .gte(JsonData.fromJson(filter.getValue()))
+                                    .boost(0.0F)
+                            ));
+                    break;
+                case MAX:
+                    boolQuery.filter(f -> f
+                            .range(r -> r
+                                    .field(filter.getKey())
+                                    .lte(JsonData.fromJson(filter.getValue()))
                                     .boost(0.0F)
                             ));
                     break;
@@ -61,5 +75,16 @@ public class SearchServiceImpl implements SearchService{
     @Override
     public Hit<ResponseDocument> searchById(String indexName, String id) {
         return null;
+    }
+
+    @Override
+    public SearchResponse<ResponseDocument> trending(String indexName, int num, int page, List<Filter> filters) throws IOException, NoSearchResultException {
+        BoolQuery.Builder filter = this._buildFilter(filters);
+        page = page * num;
+        SearchResponse<ResponseDocument> result = elasticConnection.trending(indexName, num, page, filter);
+        if (result.hits().hits().size() == 0 && num != 0){
+            throw new NoSearchResultException();
+        }
+        return result;
     }
 }

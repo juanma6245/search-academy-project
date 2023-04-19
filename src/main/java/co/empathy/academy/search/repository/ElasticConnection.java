@@ -2,6 +2,9 @@ package co.empathy.academy.search.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
+import co.elastic.clients.elasticsearch._types.FieldSort;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.*;
@@ -262,5 +265,27 @@ public class ElasticConnection {
         aggregationMap.put("maxDuration", aggregationMaxDuration);
 
         return aggregationMap;
+    }
+
+    public SearchResponse<ResponseDocument> getAggregations(String indexName) throws IOException {
+        Map<String, Aggregation> aggregationMap = this._getBasicsAggregations();
+        SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
+        request.aggregations(aggregationMap);
+        request.size(0);
+
+        SearchResponse<ResponseDocument> response = this.client.search(request.build(), ResponseDocument.class);
+        return response;
+    }
+
+    public SearchResponse<ResponseDocument> trending(String indexName, int num, int page, BoolQuery.Builder filter) throws IOException {
+        SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
+        request.query(filter.build()._toQuery());
+        request.sort(s -> s
+                .field(FieldSort.of(f -> f
+                        .field("averageRating")
+                        .order(SortOrder.Desc)
+                )));
+        SearchResponse<ResponseDocument> response = this.client.search(request.build(), ResponseDocument.class);
+        return response;
     }
 }

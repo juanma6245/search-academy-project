@@ -27,4 +27,6 @@ public interface SearchService {
      * @return the document that match the id
      */
     Hit<ResponseDocument> searchById(String indexName, String id);
+
+    SearchResponse<ResponseDocument> trending(String indexName, int numDocs, int page, List<Filter> filters) throws IOException, NoSearchResultException;
 }
