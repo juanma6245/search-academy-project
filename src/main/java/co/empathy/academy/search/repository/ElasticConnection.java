@@ -2,11 +2,11 @@ package co.empathy.academy.search.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.search.CompletionSuggest;
 import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -35,6 +35,7 @@ public class ElasticConnection {
 
     @Autowired
     private DocumentStorage documentStorage;
+    private CompletionSuggest.Builder suggestBuilder;
 
     public ElasticConnection(RestClient restClient) {
         //restClient =RestClient.builder(
@@ -172,23 +173,33 @@ public class ElasticConnection {
                 .fields("primaryTitle", "originalTitle")
                 .type(TextQueryType.BestFields)
         );
-        MatchPhrasePrefixQuery prefixQuery = MatchPhrasePrefixQuery.of(q -> q
-                .field("primaryTitle")
-                .query(query)
-        );
 
         listQuery.add(nameQuery._toQuery());
         listQuery.add(filter.build()._toQuery());
         boolQuery.must(listQuery);//If not must the filtering process changes the order of the results
-        boolQuery.should(prefixQuery._toQuery()); //Should contain the prefix query to improve the results, example: "The Lord of the Rings" -> "The Lord of the Rings: The Fellowship of the Ring"
         Map<String, Aggregation> aggregationMap = this._getBasicsAggregations();
         SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
+
+
         request.query(boolQuery.build()._toQuery());
         request.aggregations(aggregationMap);
         request.size(size);
         request.from(from);
 
         SearchResponse<ResponseDocument> response =this.client.search(request.build(), ResponseDocument.class);
+        System.out.println("Total results: " + response.hits().total().value());
+        if (response.hits().total().value() == 0) {
+            System.out.println("No results found with the name query, trying with the prefix query");
+            PrefixQuery.Builder prefixBuilder = QueryBuilders.prefix().field("primaryTitle").value(query);
+
+            request = new SearchRequest.Builder().index(indexName);
+            request.query(prefixBuilder.build()._toQuery());
+            request.aggregations(aggregationMap);
+            request.size(size);
+            request.from(from);
+            System.out.println("Request");
+            response = this.client.search(request.build(), ResponseDocument.class);
+        }
         return response;
     }
 
