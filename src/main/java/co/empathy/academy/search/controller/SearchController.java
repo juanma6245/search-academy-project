@@ -45,6 +45,9 @@ public class SearchController {
                                  @RequestParam(value = "endYear", required = false) String endYearString,
                                  @RequestParam(value = "minMinutes", required = false) String minMinutesString,
                                  @RequestParam(value = "maxMinutes", required = false) String maxMinutesString,
+                                 @RequestParam(value = "minRating", required = false) String minRatingString,
+                                 @RequestParam(value = "maxRating", required = false) String maxRatingString,
+                                 @RequestParam(value = "minVotes", required = false) String minVotesString,
                                  @RequestParam(value = "genres", required = false) String[] genres,
                                  @RequestParam(value = "size", required = false, defaultValue = "100") int numDocs,
                                  @RequestParam(value = "page", defaultValue = "0") int page) throws IOException, NoSearchResultException, ParseException {
@@ -63,6 +66,15 @@ public class SearchController {
         }
         if (maxMinutesString != null) {
             filters.add(new Filter(Filter.TYPE.MAX,"runtimeMinutes", maxMinutesString));
+        }
+        if (minRatingString != null) {
+            filters.add(new Filter(Filter.TYPE.MIN,"averageRating", minRatingString));
+        }
+        if (maxRatingString != null) {
+            filters.add(new Filter(Filter.TYPE.MAX,"averageRating", maxRatingString));
+        }
+        if (minVotesString != null) {
+            filters.add(new Filter(Filter.TYPE.MIN,"numVotes", minVotesString));
         }
         if (genres != null) {
             for (String genre : genres) {
