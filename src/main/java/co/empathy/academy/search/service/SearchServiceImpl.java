@@ -23,8 +23,15 @@ public class SearchServiceImpl implements SearchService{
     public SearchResponse<ResponseDocument> search(String indexName, String query,int num, int page, List<Filter> filters) throws IOException, NoSearchResultException {
         BoolQuery.Builder filter = this._buildFilter(filters);
         page = page * num;
-        SearchResponse<ResponseDocument> result = elasticConnection.search(indexName, query, num, page, filter);
-        if (result.hits().hits().size() == 0) {
+        SearchResponse<ResponseDocument> result;
+        if (query.isBlank()){
+            num = 0;
+            result = elasticConnection.getAggregations(indexName);
+        } else {
+            result = elasticConnection.search(indexName, query, num, page, filter);
+        }
+
+        if (result.hits().hits().size() == 0 && num != 0){
             throw new NoSearchResultException();
         }
         return result;

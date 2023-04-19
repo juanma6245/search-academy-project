@@ -252,4 +252,14 @@ public class ElasticConnection {
 
         return aggregationMap;
     }
+
+    public SearchResponse<ResponseDocument> getAggregations(String indexName) throws IOException {
+        Map<String, Aggregation> aggregationMap = this._getBasicsAggregations();
+        SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
+        request.aggregations(aggregationMap);
+        request.size(0);
+
+        SearchResponse<ResponseDocument> response = this.client.search(request.build(), ResponseDocument.class);
+        return response;
+    }
 }
