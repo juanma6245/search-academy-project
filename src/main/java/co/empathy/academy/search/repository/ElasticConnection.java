@@ -2,7 +2,6 @@ package co.empathy.academy.search.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.AcknowledgedResponse;
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.*;
@@ -174,18 +173,13 @@ public class ElasticConnection {
                 .fields("primaryTitle", "originalTitle")
                 .type(TextQueryType.BestFields)
         );
-        MatchPhrasePrefixQuery prefixQuery = MatchPhrasePrefixQuery.of(q -> q
-                .field("primaryTitle.autocomplete")
-                .query(query)
-        );
 
         listQuery.add(nameQuery._toQuery());
         listQuery.add(filter.build()._toQuery());
         boolQuery.must(listQuery);//If not must the filtering process changes the order of the results
         Map<String, Aggregation> aggregationMap = this._getBasicsAggregations();
         SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
-        suggestBuilder = new CompletionSuggest.Builder();
-        suggestBuilder.text(query);
+
 
         request.query(boolQuery.build()._toQuery());
         request.aggregations(aggregationMap);
@@ -196,14 +190,10 @@ public class ElasticConnection {
         System.out.println("Total results: " + response.hits().total().value());
         if (response.hits().total().value() == 0) {
             System.out.println("No results found with the name query, trying with the prefix query");
-            listQuery.remove(nameQuery._toQuery());
-            //listQuery.add(prefixQuery._toQuery());
-            boolQuery = new BoolQuery.Builder();
-            boolQuery.must(listQuery);
-            boolQuery.must(prefixQuery._toQuery());
+            PrefixQuery.Builder prefixBuilder = QueryBuilders.prefix().field("primaryTitle").value(query);
 
             request = new SearchRequest.Builder().index(indexName);
-            request.query(boolQuery.build()._toQuery());
+            request.query(prefixBuilder.build()._toQuery());
             request.aggregations(aggregationMap);
             request.size(size);
             request.from(from);
