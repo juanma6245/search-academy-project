@@ -111,6 +111,24 @@ public class IndexController {
         return new ResponseEntity(response, status);
     }
 
+    @Operation(summary = "Index the names",
+            description = "Index the names",
+            tags = {"Index"},
+            operationId = "indexName",
+            responses = {
+                    @ApiResponse(responseCode = "202", description = "Indexing started"),
+                    @ApiResponse(responseCode = "400", description = "Bad request"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
+    @PostMapping("/name/{indexName}")
+    public ResponseEntity indexName(@PathVariable String indexName,
+                                    @RequestParam("names") MultipartFile names) throws IOException {
+        File namesFile = this._getTempFile(names);
+        JobId indexJob = BackgroundJob.create(aJob()
+                .withName("Start indexing names")
+                .withDetails(() -> this.indexService.indexNames(indexName, namesFile)));
+        return ResponseEntity.accepted().build();
+    }
     /**
      * Convert a MultipartFile to a temporary file
      * @param file File to be converted to a temporary file
