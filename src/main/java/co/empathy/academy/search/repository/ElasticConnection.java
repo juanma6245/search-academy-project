@@ -286,6 +286,8 @@ public class ElasticConnection {
     public SearchResponse<ResponseDocument> trending(String indexName, int num, int page, BoolQuery.Builder filter) throws IOException {
         SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
         request.query(filter.build()._toQuery());
+        request.size(num);
+        request.from(page);
         request.sort(s -> s
                 .field(FieldSort.of(f -> f
                         .field("averageRating")
