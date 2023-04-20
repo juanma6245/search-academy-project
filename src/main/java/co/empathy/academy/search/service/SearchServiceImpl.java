@@ -7,6 +7,7 @@ import co.elastic.clients.json.JsonData;
 import co.empathy.academy.search.exception.NoSearchResultException;
 import co.empathy.academy.search.model.Filter;
 import co.empathy.academy.search.model.ResponseDocument;
+import co.empathy.academy.search.model.ResponseName;
 import co.empathy.academy.search.repository.ElasticConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -107,6 +108,15 @@ public class SearchServiceImpl implements SearchService{
             throw new NoSearchResultException();
         }
         return response;
+    }
+
+    @Override
+    public ResponseName searchName(String indexName, String nconst) throws IOException, NoSearchResultException {
+        SearchResponse<ResponseName> result = elasticConnection.getName(indexName, nconst);
+        if (result.hits().hits().size() == 0){
+            throw new NoSearchResultException();
+        }
+        return result.hits().hits().get(0).source();
     }
 
 }

@@ -40,6 +40,7 @@ public class IndexServiceImpl implements IndexService{
     private BufferedReader pr;
     private BufferedReader rr;
     private BufferedReader cr;
+    private BufferedReader nr;
     private boolean endFile;
     private TitleReader reader;
 
@@ -102,6 +103,46 @@ public class IndexServiceImpl implements IndexService{
     public Map<String, IndexState> getIndexes() throws IOException {
         Map<String, IndexState> indices = this.elasticConnection.getClient().indices().get(request -> request.index("*")).result();
         return indices;
+    }
+
+    @Override
+    public void indexNames(String indexName, File namesFile) throws IOException {
+        this.reader = new TitleReader(TSVService);
+        this.nr = new BufferedReader(new InputStreamReader(new FileInputStream(namesFile)));
+        this.endFile = false;
+        while(this.endFile == false) {
+            List<JsonObject> json = this._getNames();
+            String key = this.documentStorage.add(json);
+            JobId jobId = BackgroundJob.create(aJob()
+                    .withName("Indexing data Names")
+                    .withDetails(() -> elasticConnection.bulk(indexName, key)));
+        }
+    }
+
+    private List<JsonObject> _getNames() throws IOException {
+        int linesRead = 0;
+        List<JsonObject> response = new ArrayList<>();
+
+        while (linesRead < MAX_LINES) {
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            //Read name data
+            String[] nameData = reader.getName(this.nr);
+            if (nameData == null) {
+                this.endFile = true;
+                break;
+            }
+            //Build the json
+            this._buildFromData(nameData, builder);
+            response.add(builder.build());
+            linesRead++;
+        }
+        return response;
+    }
+
+    private void _buildFromData(String[] nameData, JsonObjectBuilder builder) {
+        builder.add("nconst", nameData[0]);
+        builder.add("primaryName", nameData[1]);
+        //Just need name
     }
 
     /**

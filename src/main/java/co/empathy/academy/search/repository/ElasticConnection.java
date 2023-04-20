@@ -16,6 +16,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import co.empathy.academy.search.common.DocumentStorage;
 import co.empathy.academy.search.model.ResponseDocument;
+import co.empathy.academy.search.model.ResponseName;
 import co.empathy.academy.search.model.title.Title;
 import jakarta.json.JsonObject;
 import org.elasticsearch.client.RestClient;
@@ -86,7 +87,7 @@ public class ElasticConnection {
         //long init = System.currentTimeMillis();
         BulkRequest.Builder br = new BulkRequest.Builder();
         List<JsonObject> jsonObjects = this.documentStorage.get(key);
-        System.out.println(jsonObjects.get(0).getString("tconst"));
+        //System.out.println(jsonObjects.get(0).getString("tconst"));
         for (JsonObject jsonObject : jsonObjects) {
             br.operations(op -> op
                     .index(idx -> idx
@@ -337,6 +338,20 @@ public class ElasticConnection {
         SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
         request.query(QueryBuilders.match().field("tconst").query(tconst).build()._toQuery());
         SearchResponse<ResponseDocument> response = this.client.search(request.build(), ResponseDocument.class);
+        return response;
+    }
+
+    /**
+     * Get the name with the given nconst
+     * @param indexName name of the index
+     * @param nconst nconst of the name
+     * @return a SearchResponse with the person
+     * @throws IOException if the request fails
+     */
+    public SearchResponse<ResponseName> getName(String indexName, String nconst) throws IOException {
+        SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
+        request.query(QueryBuilders.match().field("nconst").query(nconst).build()._toQuery());
+        SearchResponse<ResponseName> response = this.client.search(request.build(), ResponseName.class);
         return response;
     }
 }

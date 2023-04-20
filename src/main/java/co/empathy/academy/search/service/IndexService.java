@@ -3,6 +3,7 @@ package co.empathy.academy.search.service;
 import co.elastic.clients.elasticsearch.indices.IndexState;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -62,4 +63,12 @@ public interface IndexService {
     boolean indexExists(String indexName) throws IOException;
 
     Map<String, IndexState> getIndexes() throws IOException;
+
+    /**
+     * Indexes the names into elasticsearch in a bulk request with the given index name. If the index does not exist, it will be created.
+     * @param indexName name of the index
+     * @param namesFile file containing the names to be indexed
+     * @throws IOException if there is an error when indexing into elasticsearch
+     */
+    void indexNames(String indexName, File namesFile) throws IOException;
 }
