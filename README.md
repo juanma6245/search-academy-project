@@ -2,6 +2,10 @@
 ## Summary
 This project provides an api that allows you to index titles and names from the imdb files (https://www.imdb.com/interfaces/).
 Also you can search using diferent end point, witch are documented using swagger
+## Tecnologies
+- Java Spring-Boot
+- ElasticSearch
+- Jobrunr
 ## Installation and setup
 Download
 ````
