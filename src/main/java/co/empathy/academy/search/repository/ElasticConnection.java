@@ -86,7 +86,7 @@ public class ElasticConnection {
         //long init = System.currentTimeMillis();
         BulkRequest.Builder br = new BulkRequest.Builder();
         List<JsonObject> jsonObjects = this.documentStorage.get(key);
-        System.out.println(jsonObjects.get(0).getString("tconst"));
+        //System.out.println(jsonObjects.get(0).getString("tconst"));
         for (JsonObject jsonObject : jsonObjects) {
             br.operations(op -> op
                     .index(idx -> idx

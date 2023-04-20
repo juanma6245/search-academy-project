@@ -58,4 +58,12 @@ public class TitleReader {
     public Crew getCrew(BufferedReader cr) throws IOException {
         return (Crew) tsvService.readOneTSV(cr, TSVtype.CREW);
     }
+
+    public String[] getName(BufferedReader nr) throws IOException {
+        String line = nr.readLine();
+        if (line == null) {
+            return null;
+        }
+        return line.split("\t");
+    }
 }
