@@ -207,6 +207,11 @@ public class ElasticConnection {
     }
 
     private Map<String, Aggregation> _getBasicsAggregations() {
+        Aggregation aggregationType = Aggregation.of(a -> a
+                .terms(t -> t
+                        .field("titleType")
+                )
+        );
         Aggregation aggregationMinRating = Aggregation.of(a -> a
                 .min(m -> m
                         .field("averageRating")
@@ -255,6 +260,7 @@ public class ElasticConnection {
         );
 
         Map<String, Aggregation> aggregationMap = new HashMap<>();
+        aggregationMap.put("types", aggregationType);
         aggregationMap.put("minRating", aggregationMinRating);
         aggregationMap.put("maxRating", aggregationMaxRating);
         aggregationMap.put("genres", aggregationGenres);
