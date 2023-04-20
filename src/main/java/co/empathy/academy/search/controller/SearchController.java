@@ -84,38 +84,10 @@ public class SearchController {
         //Search request
         SearchResponse<ResponseDocument> result = this.searchService.search(INDEX_NAME, query, numDocs, page, filters);
         //Parse response
-        List<ResponseDocument> documents = new ArrayList<>();
-        for (Hit<ResponseDocument> hit : result.hits().hits()) {
-            documents.add(hit.source());
-        }
+        List<ResponseDocument> documents = this._parseResponse(result);
+        //Get aggregations
+        List<Map<String, Object>> aggs = this._getAggregations(result);
 
-        List<Map<String, Object>> aggs = new ArrayList<>();
-        //Parse aggregations
-        Map<String, Aggregate> aggsMap = result.aggregations();
-        for (Map.Entry<String, Aggregate> entry: aggsMap.entrySet()) {
-            Object value = null;
-            if (entry.getValue().isMin()){
-                value = entry.getValue().min().value();
-            } else if (entry.getValue().isMax()) {
-                value = entry.getValue().max().value();
-            } else if (entry.getValue().isSterms()) {
-                value = new ArrayList<>();
-                for (var bucket : entry.getValue().sterms().buckets().array()) {
-                    Map<String, Object> bucketMap = Map.of(
-                            "key", bucket.key().stringValue()
-                            ,"docCount", bucket.docCount()
-                    );
-                    ((List) value).add(bucketMap);
-                }
-            } else {
-                value = entry.getValue();
-            }
-            Map<String, Object> aggMap = Map.of(
-                    "name", entry.getKey()
-                    ,"value", value
-            );
-            aggs.add(aggMap);
-        }
         Map<String, Object> response = Map.of(
                 "total", documents.size()
                 ,"hits", documents
@@ -149,10 +121,7 @@ public class SearchController {
         //Search request
         SearchResponse<ResponseDocument> result = this.searchService.trending(INDEX_NAME, numDocs, page, filters);
         //Parse response
-        List<ResponseDocument> documents = new ArrayList<>();
-        for (Hit<ResponseDocument> hit : result.hits().hits()) {
-            documents.add(hit.source());
-        }
+        List<ResponseDocument> documents = this._parseResponse(result);
 
         Map<String, Object> response = Map.of(
                 "total", documents.size()
@@ -160,5 +129,75 @@ public class SearchController {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get similar documents in elasticSearch to the given id",
+            tags = {"Search"},
+            operationId = "similar",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK",
+                            content =  @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDocument.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "404", description = "Not Found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            })
+    @GetMapping("/similar")
+    public ResponseEntity similar(@RequestParam("id") String id,
+                                    @RequestParam(value = "size", required = false, defaultValue = "20") int numDocs,
+                                    @RequestParam(value = "page", defaultValue = "0") int page) throws IOException, NoSearchResultException, ParseException {
+        //Search request
+        SearchResponse<ResponseDocument> result = this.searchService.similar(INDEX_NAME, id, numDocs, page);
+        //Parse response
+        List<ResponseDocument> documents = this._parseResponse(result);
+
+        //Get aggregations
+        List<Map<String, Object>> aggs = this._getAggregations(result);
+
+        Map<String, Object> response = Map.of(
+                "total", documents.size()
+                ,"hits", documents
+                ,"aggs", aggs
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    private List<Map<String, Object>> _getAggregations(SearchResponse<ResponseDocument> result) {
+        List<Map<String, Object>> aggs = new ArrayList<>();
+        //Parse aggregations
+        Map<String, Aggregate> aggsMap = result.aggregations();
+        for (Map.Entry<String, Aggregate> entry: aggsMap.entrySet()) {
+            Object value = null;
+            if (entry.getValue().isMin()){
+                value = entry.getValue().min().value();
+            } else if (entry.getValue().isMax()) {
+                value = entry.getValue().max().value();
+            } else if (entry.getValue().isSterms()) {
+                value = new ArrayList<>();
+                for (var bucket : entry.getValue().sterms().buckets().array()) {
+                    Map<String, Object> bucketMap = Map.of(
+                            "key", bucket.key().stringValue()
+                            ,"docCount", bucket.docCount()
+                    );
+                    ((List) value).add(bucketMap);
+                }
+            } else {
+                value = entry.getValue();
+            }
+            Map<String, Object> aggMap = Map.of(
+                    "name", entry.getKey()
+                    ,"value", value
+            );
+            aggs.add(aggMap);
+        }
+        return aggs;
+    }
+
+    private List<ResponseDocument> _parseResponse(SearchResponse<ResponseDocument> result) {
+        List<ResponseDocument> documents = new ArrayList<>();
+        for (Hit<ResponseDocument> hit : result.hits().hits()) {
+            documents.add(hit.source());
+        }
+        return documents;
     }
 }
