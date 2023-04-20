@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.search.exception.NoSearchResultException;
 import co.empathy.academy.search.model.Filter;
 import co.empathy.academy.search.model.ResponseDocument;
+import co.empathy.academy.search.model.ResponseName;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,4 +44,6 @@ public interface SearchService {
      * @throws NoSearchResultException if there is no result
      */
     SearchResponse<ResponseDocument> similar(String indexName, String id, int numDocs, int page) throws IOException, NoSearchResultException;
+
+    ResponseName searchName(String indexName, String nconst) throws IOException, NoSearchResultException;
 }
