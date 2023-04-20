@@ -9,9 +9,11 @@ import co.empathy.academy.search.model.Filter;
 import co.empathy.academy.search.model.ResponseDocument;
 import co.empathy.academy.search.repository.ElasticConnection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -87,4 +89,29 @@ public class SearchServiceImpl implements SearchService{
         }
         return result;
     }
+
+    @Override
+    public SearchResponse<ResponseDocument> similar(String indexName, String id, int num, int page) throws IOException, NoSearchResultException {
+        SearchResponse<ResponseDocument> result = elasticConnection.getById(indexName, id);
+        if (result.hits().hits().size() == 0){
+            throw new NoSearchResultException();
+        }
+        List<Filter> filters = new ArrayList<>();
+        ResponseDocument document = result.hits().hits().get(0).source();
+        filters.add(new Filter(Filter.TYPE.TERM, "titleType", document.getTitleType()));
+        filters.add(new Filter(Filter.TYPE.MIN, "startYear", String.valueOf(document.getStartYear() - 10)));
+        filters.add(new Filter(Filter.TYPE.MAX, "startYear", String.valueOf(document.getStartYear() + 10)));
+        String[] genres = document.getGenres();
+        for (String genre : genres) {
+            filters.add(new Filter(Filter.TYPE.TERM, "genres", genre));
+        }
+        BoolQuery.Builder filter = this._buildFilter(filters);
+        page = page * num;
+        SearchResponse<ResponseDocument> response = elasticConnection.trending(indexName, num, page, filter);
+        if (response.hits().hits().size() == 0 && num != 0){
+            throw new NoSearchResultException();
+        }
+        return response;
+    }
+
 }

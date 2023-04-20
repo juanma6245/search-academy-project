@@ -294,4 +294,11 @@ public class ElasticConnection {
         SearchResponse<ResponseDocument> response = this.client.search(request.build(), ResponseDocument.class);
         return response;
     }
+
+    public SearchResponse<ResponseDocument> getById(String indexName, String id) throws IOException {
+        SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
+        request.query(QueryBuilders.match().field("tconst").query(id).build()._toQuery());
+        SearchResponse<ResponseDocument> response = this.client.search(request.build(), ResponseDocument.class);
+        return response;
+    }
 }

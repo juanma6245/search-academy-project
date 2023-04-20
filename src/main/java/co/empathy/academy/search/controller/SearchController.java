@@ -142,9 +142,9 @@ public class SearchController {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             })
     @GetMapping("/similar")
-    public ResponseEntity similar(@RequestParam("id") String id,
+    public ResponseEntity similar(@RequestParam("tconst") String id,
                                     @RequestParam(value = "size", required = false, defaultValue = "20") int numDocs,
-                                    @RequestParam(value = "page", defaultValue = "0") int page) throws IOException, NoSearchResultException, ParseException {
+                                    @RequestParam(value = "page", required = false,defaultValue = "0") int page) throws IOException, NoSearchResultException, ParseException {
         //Search request
         SearchResponse<ResponseDocument> result = this.searchService.similar(INDEX_NAME, id, numDocs, page);
         //Parse response

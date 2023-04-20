@@ -29,4 +29,6 @@ public interface SearchService {
     Hit<ResponseDocument> searchById(String indexName, String id);
 
     SearchResponse<ResponseDocument> trending(String indexName, int numDocs, int page, List<Filter> filters) throws IOException, NoSearchResultException;
+
+    SearchResponse<ResponseDocument> similar(String indexName, String id, int numDocs, int page) throws IOException, NoSearchResultException;
 }
