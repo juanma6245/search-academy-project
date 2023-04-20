@@ -84,11 +84,90 @@ public class SearchController {
         //Search request
         SearchResponse<ResponseDocument> result = this.searchService.search(INDEX_NAME, query, numDocs, page, filters);
         //Parse response
-        List<ResponseDocument> documents = new ArrayList<>();
-        for (Hit<ResponseDocument> hit : result.hits().hits()) {
-            documents.add(hit.source());
-        }
+        List<ResponseDocument> documents = this._parseResponse(result);
+        //Get aggregations
+        List<Map<String, Object>> aggs = this._getAggregations(result);
 
+        Map<String, Object> response = Map.of(
+                "total", documents.size()
+                ,"hits", documents
+                ,"aggs", aggs
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get trending films in elasticSearch, trending is defined by the rating of the title",
+            tags = {"Search"},
+            operationId = "trending",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK",
+                            content =  @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDocument.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "404", description = "Not Found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            })
+    @GetMapping("/trending")
+    public ResponseEntity trending(@RequestParam(value = "size", required = false, defaultValue = "20") int numDocs,
+                                   @RequestParam(value = "page", defaultValue = "0") int page,
+                                   @RequestParam(value = "minNumVotes", required = false, defaultValue = "100") String minNumVotes,
+                                   @RequestParam(value = "titleType", required = false, defaultValue = "movie") String titleTypeString) throws IOException, NoSearchResultException, ParseException {
+        //Add filters
+        List<Filter> filters = new ArrayList<>();
+        filters.add(new Filter(Filter.TYPE.TERM,"titleType", titleTypeString));
+        if (minNumVotes != null) {
+            filters.add(new Filter(Filter.TYPE.MIN, "numVotes", minNumVotes));
+        }
+        //Search request
+        SearchResponse<ResponseDocument> result = this.searchService.trending(INDEX_NAME, numDocs, page, filters);
+        //Parse response
+        List<ResponseDocument> documents = this._parseResponse(result);
+
+        Map<String, Object> response = Map.of(
+                "total", documents.size()
+                ,"hits", documents
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get similar titles in elasticSearch to the given id",
+            tags = {"Search"},
+            operationId = "similar",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK",
+                            content =  @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDocument.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "404", description = "Not Found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            })
+    @GetMapping("/similar")
+    public ResponseEntity similar(@RequestParam("tconst") String id,
+                                    @RequestParam(value = "size", required = false, defaultValue = "20") int numDocs,
+                                    @RequestParam(value = "page", required = false,defaultValue = "0") int page) throws IOException, NoSearchResultException, ParseException {
+        //Search request
+        SearchResponse<ResponseDocument> result = this.searchService.similar(INDEX_NAME, id, numDocs, page);
+        //Parse response
+        List<ResponseDocument> documents = this._parseResponse(result);
+
+        //Get aggregations
+        List<Map<String, Object>> aggs = this._getAggregations(result);
+
+        Map<String, Object> response = Map.of(
+                "total", documents.size()
+                ,"hits", documents
+                ,"aggs", aggs
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Parse the aggregations from the search response and return a list of maps with the aggregations that can be used as json
+     * @param result Search response
+     * @return List of maps with the aggregations
+     */
+    private List<Map<String, Object>> _getAggregations(SearchResponse<ResponseDocument> result) {
         List<Map<String, Object>> aggs = new ArrayList<>();
         //Parse aggregations
         Map<String, Aggregate> aggsMap = result.aggregations();
@@ -116,49 +195,19 @@ public class SearchController {
             );
             aggs.add(aggMap);
         }
-        Map<String, Object> response = Map.of(
-                "total", documents.size()
-                ,"hits", documents
-                ,"aggs", aggs
-        );
-
-        return ResponseEntity.ok(response);
+        return aggs;
     }
 
-    @Operation(summary = "Get trending films in elasticSearch",
-            tags = {"Search"},
-            operationId = "trending",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "OK",
-                            content =  @Content(mediaType = "application/json", schema = @Schema(implementation = ResponseDocument.class))),
-                    @ApiResponse(responseCode = "400", description = "Bad Request"),
-                    @ApiResponse(responseCode = "404", description = "Not Found"),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
-            })
-    @GetMapping("/trending")
-    public ResponseEntity trending(@RequestParam(value = "size", required = false, defaultValue = "20") int numDocs,
-                                   @RequestParam(value = "page", defaultValue = "0") int page,
-                                   @RequestParam(value = "minNumVotes", required = false, defaultValue = "100") String minNumVotes,
-                                   @RequestParam(value = "titleType", required = false, defaultValue = "movie") String titleTypeString) throws IOException, NoSearchResultException, ParseException {
-        //Add filters
-        List<Filter> filters = new ArrayList<>();
-        filters.add(new Filter(Filter.TYPE.TERM,"titleType", titleTypeString));
-        if (minNumVotes != null) {
-            filters.add(new Filter(Filter.TYPE.MIN, "numVotes", minNumVotes));
-        }
-        //Search request
-        SearchResponse<ResponseDocument> result = this.searchService.trending(INDEX_NAME, numDocs, page, filters);
-        //Parse response
+    /**
+     * Parse the search response and return a list of documents
+     * @param result Search response
+     * @return List of documents
+     */
+    private List<ResponseDocument> _parseResponse(SearchResponse<ResponseDocument> result) {
         List<ResponseDocument> documents = new ArrayList<>();
         for (Hit<ResponseDocument> hit : result.hits().hits()) {
             documents.add(hit.source());
         }
-
-        Map<String, Object> response = Map.of(
-                "total", documents.size()
-                ,"hits", documents
-        );
-
-        return ResponseEntity.ok(response);
+        return documents;
     }
 }

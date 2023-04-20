@@ -168,6 +168,16 @@ public class ElasticConnection {
         this.client.indices().putMapping(request -> request.index(indexName).withJson(mappingInputStream));
     }
 
+    /**
+     * Search in an index in elasticSearch with a query and some filters
+     * @param indexName name of the index
+     * @param query query to search
+     * @param size number of results to return
+     * @param from number of results to skip
+     * @param filter filters to apply (must be a builder)
+     * @return response of the search request (includes results and aggregations)
+     * @throws IOException if the request fails
+     */
     public SearchResponse search(String indexName, String query,int size, int from, BoolQuery.Builder filter) throws IOException {
         List<Query> listQuery = new ArrayList<>();
         BoolQuery.Builder boolQuery = new BoolQuery.Builder();
@@ -206,7 +216,16 @@ public class ElasticConnection {
         return response;
     }
 
+    /**
+     * Get the aggregations to use in the search
+     * @return a map with the aggregations to use in the search
+     */
     private Map<String, Aggregation> _getBasicsAggregations() {
+        Aggregation aggregationType = Aggregation.of(a -> a
+                .terms(t -> t
+                        .field("titleType")
+                )
+        );
         Aggregation aggregationMinRating = Aggregation.of(a -> a
                 .min(m -> m
                         .field("averageRating")
@@ -255,6 +274,7 @@ public class ElasticConnection {
         );
 
         Map<String, Aggregation> aggregationMap = new HashMap<>();
+        aggregationMap.put("types", aggregationType);
         aggregationMap.put("minRating", aggregationMinRating);
         aggregationMap.put("maxRating", aggregationMaxRating);
         aggregationMap.put("genres", aggregationGenres);
@@ -267,6 +287,12 @@ public class ElasticConnection {
         return aggregationMap;
     }
 
+    /**
+     * Get the aggregations of an index. It takes into account all the documents in the index
+     * @param indexName name of the index
+     * @return a map with the aggregations
+     * @throws IOException if the request fails
+     */
     public SearchResponse<ResponseDocument> getAggregations(String indexName) throws IOException {
         Map<String, Aggregation> aggregationMap = this._getBasicsAggregations();
         SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
@@ -277,14 +303,39 @@ public class ElasticConnection {
         return response;
     }
 
+    /**
+     * Get the trending documents of an index (the ones with the highest average rating)
+     * @param indexName name of the index
+     * @param num number of documents to return
+     * @param page number of results to skip
+     * @param filter filters to apply to the search
+     * @return a SearchResponse with the trending documents
+     * @throws IOException if the request fails
+     */
     public SearchResponse<ResponseDocument> trending(String indexName, int num, int page, BoolQuery.Builder filter) throws IOException {
         SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
         request.query(filter.build()._toQuery());
+        request.size(num);
+        request.from(page);
         request.sort(s -> s
                 .field(FieldSort.of(f -> f
                         .field("averageRating")
                         .order(SortOrder.Desc)
                 )));
+        SearchResponse<ResponseDocument> response = this.client.search(request.build(), ResponseDocument.class);
+        return response;
+    }
+
+    /**
+     * Get the document with the given tconst
+     * @param indexName name of the index
+     * @param tconst tconst of the document
+     * @return a SearchResponse with the document
+     * @throws IOException if the request fails
+     */
+    public SearchResponse<ResponseDocument> getById(String indexName, String tconst) throws IOException {
+        SearchRequest.Builder request = new SearchRequest.Builder().index(indexName);
+        request.query(QueryBuilders.match().field("tconst").query(tconst).build()._toQuery());
         SearchResponse<ResponseDocument> response = this.client.search(request.build(), ResponseDocument.class);
         return response;
     }
