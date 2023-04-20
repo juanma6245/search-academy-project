@@ -131,7 +131,7 @@ public class SearchController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get similar documents in elasticSearch to the given id",
+    @Operation(summary = "Get similar titles in elasticSearch to the given id",
             tags = {"Search"},
             operationId = "similar",
             responses = {
@@ -162,6 +162,11 @@ public class SearchController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Parse the aggregations from the search response and return a list of maps with the aggregations that can be used as json
+     * @param result Search response
+     * @return List of maps with the aggregations
+     */
     private List<Map<String, Object>> _getAggregations(SearchResponse<ResponseDocument> result) {
         List<Map<String, Object>> aggs = new ArrayList<>();
         //Parse aggregations
@@ -193,6 +198,11 @@ public class SearchController {
         return aggs;
     }
 
+    /**
+     * Parse the search response and return a list of documents
+     * @param result Search response
+     * @return List of documents
+     */
     private List<ResponseDocument> _parseResponse(SearchResponse<ResponseDocument> result) {
         List<ResponseDocument> documents = new ArrayList<>();
         for (Hit<ResponseDocument> hit : result.hits().hits()) {

@@ -21,14 +21,26 @@ public interface SearchService {
     SearchResponse<ResponseDocument> search(String indexName, String query,int num, int page, List<Filter> filters) throws IOException, NoSearchResultException;
 
     /**
-     * Search for a document in elasticSearch that match the id provided in parameter
+     * Search for documents in elasticSearch that are trending (high rating)
      * @param indexName index name
-     * @param id id of the document to search
-     * @return the document that match the id
+     * @param numDocs number of documents to return
+     * @param page page number
+     * @param filters filters to apply (ex: min number of votes)
+     * @return list of documents that are trending
+     * @throws IOException if the connection to elasticSearch fails
+     * @throws NoSearchResultException if there is no result
      */
-    Hit<ResponseDocument> searchById(String indexName, String id);
-
     SearchResponse<ResponseDocument> trending(String indexName, int numDocs, int page, List<Filter> filters) throws IOException, NoSearchResultException;
 
+    /**
+     * Search for documents in elasticSearch that are similar to the document with the id provided in parameter (similar means same genre and close in startYear)
+     * @param indexName index name
+     * @param id tconst of the document
+     * @param numDocs number of documents to return
+     * @param page page number
+     * @return list of documents that are similar to the id provided in parameter
+     * @throws IOException if the connection to elasticSearch fails
+     * @throws NoSearchResultException if there is no result
+     */
     SearchResponse<ResponseDocument> similar(String indexName, String id, int numDocs, int page) throws IOException, NoSearchResultException;
 }

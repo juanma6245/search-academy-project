@@ -75,11 +75,6 @@ public class SearchServiceImpl implements SearchService{
     }
 
     @Override
-    public Hit<ResponseDocument> searchById(String indexName, String id) {
-        return null;
-    }
-
-    @Override
     public SearchResponse<ResponseDocument> trending(String indexName, int num, int page, List<Filter> filters) throws IOException, NoSearchResultException {
         BoolQuery.Builder filter = this._buildFilter(filters);
         page = page * num;
