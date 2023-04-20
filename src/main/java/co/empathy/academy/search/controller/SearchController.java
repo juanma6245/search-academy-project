@@ -125,7 +125,7 @@ public class SearchController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get trending films in elasticSearch",
+    @Operation(summary = "Get trending films in elasticSearch, trending is defined by the rating of the title",
             tags = {"Search"},
             operationId = "trending",
             responses = {
