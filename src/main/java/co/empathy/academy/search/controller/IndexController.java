@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import org.jobrunr.jobs.Job;
 import org.jobrunr.jobs.JobId;
 import org.jobrunr.scheduling.BackgroundJob;
 import org.jobrunr.utils.io.IOUtils;

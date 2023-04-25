@@ -17,10 +17,10 @@ import java.io.IOException;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    //@ExceptionHandler(value = {IOException.class, FileNotFoundException.class})
+    @ExceptionHandler(value = {FileNotFoundException.class})
     protected ResponseEntity<?> handleFileError(Exception ex, WebRequest request) {
-        String body = "Error in file upload";
-        return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        JsonObject body = Json.createObjectBuilder().add("message", "Error in file upload").build();
+        return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     @ExceptionHandler(value = {NoSearchResultException.class})

@@ -1,7 +1,6 @@
 package co.empathy.academy.search.service;
 
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.search.exception.NoSearchResultException;
 import co.empathy.academy.search.model.Filter;
 import co.empathy.academy.search.model.ResponseDocument;
@@ -45,5 +44,12 @@ public interface SearchService {
      */
     SearchResponse<ResponseDocument> similar(String indexName, String id, int numDocs, int page) throws IOException, NoSearchResultException;
 
+    /**
+     * @param indexName index name
+     * @param nconst nconst of the person
+     * @return ResponseName with the name of the person(nconst and primaryName)
+     * @throws IOException if the connection to elasticSearch fails
+     * @throws NoSearchResultException if there is no result
+     */
     ResponseName searchName(String indexName, String nconst) throws IOException, NoSearchResultException;
 }

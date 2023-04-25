@@ -119,6 +119,11 @@ public class IndexServiceImpl implements IndexService{
         }
     }
 
+    /**
+     * Generates a list of json objects with the names read from the nr reader and a maximum length of MAX_LINES
+     * @return List of json objects with the names read from the nr reader
+     * @throws IOException
+     */
     private List<JsonObject> _getNames() throws IOException {
         int linesRead = 0;
         List<JsonObject> response = new ArrayList<>();
@@ -139,6 +144,11 @@ public class IndexServiceImpl implements IndexService{
         return response;
     }
 
+    /**
+     * Adds nconst and primaryName to the builder. The rest of the data is not needed
+     * @param nameData data read from the reader
+     * @param builder json builder
+     */
     private void _buildFromData(String[] nameData, JsonObjectBuilder builder) {
         builder.add("nconst", nameData[0]);
         builder.add("primaryName", nameData[1]);

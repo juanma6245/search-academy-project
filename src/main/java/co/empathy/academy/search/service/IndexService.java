@@ -3,7 +3,6 @@ package co.empathy.academy.search.service;
 import co.elastic.clients.elasticsearch.indices.IndexState;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
