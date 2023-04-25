@@ -3,7 +3,6 @@ package co.empathy.academy.search.common;
 import co.empathy.academy.search.common.factory.FactoryTitle;
 import co.empathy.academy.search.model.title.*;
 import co.empathy.academy.search.service.TSVService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.IOException;

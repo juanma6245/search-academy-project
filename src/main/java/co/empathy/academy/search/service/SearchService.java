@@ -1,7 +1,6 @@
 package co.empathy.academy.search.service;
 
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.search.exception.NoSearchResultException;
 import co.empathy.academy.search.model.Filter;
 import co.empathy.academy.search.model.ResponseDocument;

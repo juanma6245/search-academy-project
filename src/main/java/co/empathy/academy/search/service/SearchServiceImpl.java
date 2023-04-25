@@ -2,7 +2,6 @@ package co.empathy.academy.search.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import co.empathy.academy.search.exception.NoSearchResultException;
 import co.empathy.academy.search.model.Filter;
@@ -10,7 +9,6 @@ import co.empathy.academy.search.model.ResponseDocument;
 import co.empathy.academy.search.model.ResponseName;
 import co.empathy.academy.search.repository.ElasticConnection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
